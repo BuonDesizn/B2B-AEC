@@ -101,7 +101,7 @@ CREATE TRIGGER equipment_updated_at
 CREATE INDEX IF NOT EXISTS idx_unmasking_audit_viewer ON unmasking_audit(viewer_id);
 CREATE INDEX IF NOT EXISTS idx_unmasking_audit_viewed ON unmasking_audit(viewed_id);
 CREATE INDEX IF NOT EXISTS idx_unmasking_audit_unmasked_at ON unmasking_audit(unmasked_at);
-CREATE INDEX IF NOT EXISTS idx_unmasking_audit_retention ON unmasking_audit(retention_expires_at) WHERE retention_expires_at < NOW();
+CREATE INDEX IF NOT EXISTS idx_unmasking_audit_retention ON unmasking_audit(retention_expires_at);
 
 -- =============================================================================
 -- SECTION 4: Prevent Audit Modification

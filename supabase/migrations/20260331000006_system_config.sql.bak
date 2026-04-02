@@ -16,36 +16,29 @@ CREATE TABLE IF NOT EXISTS system_config (
 );
 
 -- Seed: Discovery ranking weights (70% quality, 30% distance)
-INSERT INTO system_config (key, value, description) VALUES
-  ('discovery_ranking_split', '{"quality_weight": 0.7, "distance_weight": 0.3}'::jsonb, 'Weight split for discovery ranking formula');
-INSERT INTO system_config (key, value, description) VALUES
-  ('max_search_radius_km', '500'::jsonb, 'Maximum search radius in kilometers');
-INSERT INTO system_config (key, value, description) VALUES
-  ('default_search_radius_km', '50'::jsonb, 'Default search radius in kilometers');
-INSERT INTO system_config (key, value, description) VALUES
-  ('handshake_credits_monthly', '30'::jsonb, 'Monthly handshake credits for active subscriptions');
-INSERT INTO system_config (key, value, description) VALUES
-  ('trial_duration_hours', '48'::jsonb, 'Trial period duration in hours');
-INSERT INTO system_config (key, value, description) VALUES
-  ('connection_expiry_days', '30'::jsonb, 'Days before a REQUESTED connection expires');
-INSERT INTO system_config (key, value, description) VALUES
-  ('rfp_default_expiry_days', '30'::jsonb, 'Default RFP expiry in days');
-INSERT INTO system_config (key, value, description) VALUES
-  ('dqs_recurrence_cron', '"0 2 * * *"'::jsonb, 'Cron schedule for DQS recalculation (UTC)');
+  INSERT INTO system_config (key, value, description) VALUES
+    ('discovery_ranking_split', '{"quality_weight": 0.7, "distance_weight": 0.3}'::jsonb, 'Weight split for discovery ranking formula'),
+    ('max_search_radius_km', '500'::jsonb, 'Maximum search radius in kilometers'),
+    ('default_search_radius_km', '50'::jsonb, 'Default search radius in kilometers'),
+    ('handshake_credits_monthly', '30'::jsonb, 'Monthly handshake credits for active subscriptions'),
+    ('trial_duration_hours', '48'::jsonb, 'Trial period duration in hours'),
+    ('connection_expiry_days', '30'::jsonb, 'Days before a REQUESTED connection expires'),
+    ('rfp_default_expiry_days', '30'::jsonb, 'Default RFP expiry in days'),
+    ('dqs_recurrence_cron', E'0 2 * * *'::jsonb, 'Cron schedule for DQS recalculation (UTC)');
 
 ALTER TABLE system_config ENABLE ROW LEVEL SECURITY;
 
 -- Only super-admin can modify system config
 CREATE POLICY "system_config_select_authenticated" ON system_config
-    FOR SELECT TO authenticated
-    USING (true);
+   FOR SELECT TO authenticated
+   USING (true);
 
 CREATE POLICY "system_config_admin_update" ON system_config
-    FOR ALL USING (false); -- Service role only
+   FOR ALL USING (false); -- Service role only
 
 CREATE TRIGGER system_config_updated_at
-     BEFORE UPDATE ON system_config
-     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    BEFORE UPDATE ON system_config
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- =============================================================================
 -- SECTION 2: System Audit Log
@@ -73,10 +66,10 @@ ALTER TABLE system_audit_log ENABLE ROW LEVEL SECURITY;
 
 -- Immutable — INSERT only via service role
 CREATE POLICY "system_audit_log_insert" ON system_audit_log
-    FOR INSERT WITH CHECK (true);
+   FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "system_audit_log_admin_select" ON system_audit_log
-    FOR SELECT USING (false); -- Service role only
+   FOR SELECT USING (false); -- Service role only
 
 -- =============================================================================
 -- SECTION 3: Audit Purge Queue (GDPR)
@@ -99,7 +92,7 @@ CREATE INDEX IF NOT EXISTS idx_purge_queue_status ON audit_purge_queue(status);
 ALTER TABLE audit_purge_queue ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "audit_purge_queue_admin_all" ON audit_purge_queue
-    FOR ALL USING (false); -- Service role only
+   FOR ALL USING (false); -- Service role only
 
 -- =============================================================================
 -- SECTION 4: Async Jobs (QStash)
@@ -126,8 +119,8 @@ CREATE INDEX IF NOT EXISTS idx_async_jobs_scheduled ON async_jobs(scheduled_at) 
 ALTER TABLE async_jobs ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "async_jobs_system_all" ON async_jobs
-    FOR ALL USING (true);
+   FOR ALL USING (true);
 
 CREATE TRIGGER async_jobs_updated_at
-     BEFORE UPDATE ON async_jobs
-     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+    BEFORE UPDATE ON async_jobs
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

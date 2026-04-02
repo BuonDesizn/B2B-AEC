@@ -51,12 +51,16 @@ $$;
 -- Spec: docs/database/rls_policies.md §get_visible_contact_info
 -- =============================================================================
 
-CREATE TYPE IF NOT EXISTS contact_info AS (
-  phone_primary    TEXT,
-  phone_secondary  TEXT,
-  email_business   TEXT,
-  is_masked        BOOLEAN
-);
+DO $$ BEGIN
+  CREATE TYPE contact_info AS (
+    phone_primary    TEXT,
+    phone_secondary  TEXT,
+    email_business   TEXT,
+    is_masked        BOOLEAN
+  );
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 CREATE OR REPLACE FUNCTION get_visible_contact_info(
   p_viewer_id UUID,
@@ -251,10 +255,10 @@ CREATE POLICY "connections_update_parties"
   WITH CHECK (
     -- Target accepts or rejects a pending request
     (auth.uid() = target_id
-      AND OLD.status = 'REQUESTED'
-      AND NEW.status IN ('ACCEPTED', 'REJECTED'))
+      AND status = 'REQUESTED'
+      AND status IN ('ACCEPTED', 'REJECTED'))
     -- Either party blocks (from any non-expired state)
-    OR (NEW.status = 'BLOCKED' AND OLD.status NOT IN ('EXPIRED', 'BLOCKED'))
+    OR (status = 'BLOCKED' AND status NOT IN ('EXPIRED', 'BLOCKED'))
   );
 
 -- No DELETE policy
@@ -344,63 +348,8 @@ CREATE POLICY "subscriptions_select_own"
 -- INSERT / UPDATE / DELETE: service role only (PhonePe webhook)
 
 -- =============================================================================
--- RLS POLICIES: role extension tables
--- (project_professionals, consultants, contractors, product_sellers, equipment_dealers)
--- =============================================================================
-
-DO $$
-DECLARE
-  tbl TEXT;
-BEGIN
-  FOREACH tbl IN ARRAY ARRAY[
-    'project_professionals',
-    'consultants',
-    'contractors',
-    'product_sellers',
-    'equipment_dealers'
-  ]
-  LOOP
-    EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', tbl);
-
-    -- Public read (non-PII; PII on profiles accessed via get_visible_contact_info)
-    EXECUTE format(
-      'CREATE POLICY %I ON %I FOR SELECT TO authenticated
-       USING (EXISTS (
-         SELECT 1 FROM profiles p
-         WHERE p.id = %I.profile_id
-           AND p.deleted_at IS NULL
-           AND p.subscription_status != ''hard_locked''
-       ))',
-      tbl || '_select_public', tbl, tbl
-    );
-
-    EXECUTE format(
-      'CREATE POLICY %I ON %I FOR INSERT TO authenticated
-       WITH CHECK (auth.uid() = profile_id)',
-      tbl || '_insert_own', tbl
-    );
-
-    EXECUTE format(
-      'CREATE POLICY %I ON %I FOR UPDATE TO authenticated
-       USING (auth.uid() = profile_id)
-       WITH CHECK (auth.uid() = profile_id)',
-      tbl || '_update_own', tbl
-    );
-
-    EXECUTE format(
-      'CREATE POLICY %I ON %I FOR DELETE TO authenticated
-       USING (auth.uid() = profile_id)',
-      tbl || '_delete_own', tbl
-    );
-  END LOOP;
-END;
-$$;
-
--- =============================================================================
--- NOTE: rfps, rfp_responses, ads, notifications RLS
--- These tables are defined in subsequent migrations:
---   20260331000002_rfps.sql
---   20260331000003_ads_monetization.sql
--- Their RLS policies are co-located in those migration files per the
+-- NOTE: Role extension tables RLS policies
+-- These tables are defined in migration 000002_role_extensions.sql
+-- RLS policies are co-located in that migration file per the
 -- "RLS lives with its table" convention. See rls_policies.md for the policy specs.
 -- =============================================================================
