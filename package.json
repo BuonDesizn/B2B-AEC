@@ -1,0 +1,15 @@
+{
+  "name": "buondesizn-b2b-marketplace",
+  "version": "1.0.0",
+  "description": "B2B Marketplace for AEC Professionals",
+  "scripts": {
+    "dev": "npm run dev --prefix app_build",
+    "build": "npm run build --prefix app_build",
+    "start": "npm run start --prefix app_build",
+    "lint": "npm run lint --prefix app_build",
+    "clean": "find . -name '.DS_Store' -delete",
+    "prod:kickoff": "echo 'System Audited and Ready. Initiating Module 1: Personnel.'"
+  },
+  "author": "BuonDesizn",
+  "license": "Proprietary"
+}

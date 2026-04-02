@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate (type-check + lint + format)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app_build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app_build/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run type-check
+
+      - run: npm run lint
+
+      - run: npm run format:check
+
+  test-unit:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app_build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app_build/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run test
+
+  # E2E jobs are disabled until Supabase local instance is available in CI.
+  # Uncomment and configure when ready.
+  #
+  # test-e2e:
+  #   name: E2E Tests
+  #   runs-on: ubuntu-latest
+  #   defaults:
+  #     run:
+  #       working-directory: app_build
+  #   services:
+  #     supabase:
+  #       image: supabase/postgres:15
+  #       env:
+  #         POSTGRES_PASSWORD: postgres
+  #       ports:
+  #         - 5432:5432
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 20
+  #         cache: npm
+  #         cache-dependency-path: app_build/package-lock.json
+  #     - run: npm ci
+  #     - run: npx playwright install --with-deps
+  #     - run: npm run build
+  #     - run: npm run test:e2e
+  #       env:
+  #         CI: true

@@ -1,0 +1,32 @@
+-- =============================================================================
+-- BuonDesizn B2B Marketplace — Seed Data (Local Dev & TDD)
+-- @witness [ID-001] [HD-001] [RM-001]
+-- Source of truth: docs/database/MOCK_DATA_BLUEPRINT.md
+-- =============================================================================
+-- AGENT INSTRUCTION: Use the mock data shapes from MOCK_DATA_BLUEPRINT.md.
+-- This file provides local dev seed data ONLY. Never seed production.
+-- Run after migrations: supabase db reset (applies migrations + seed)
+-- =============================================================================
+
+-- Note: auth.users rows must be created via Supabase Auth API or test helpers.
+-- The profiles rows below assume auth.users UUIDs are pre-seeded via test setup.
+
+-- Example seed: Individual Professional (PP) — DQS 0.85
+-- INSERT INTO profiles (id, email, persona_type, pan, display_name, city, state,
+--   phone, dqs_score, subscription_status, trial_started_at)
+-- VALUES (
+--   '00000000-0000-0000-0000-000000000001',
+--   'arjun.mehta@test.com',
+--   'PP',
+--   'ABCPM1234D',
+--   'Arjun Mehta',
+--   'Mumbai',
+--   'Maharashtra',
+--   '+919876543210',
+--   0.85,
+--   'active',
+--   now() - INTERVAL '10 days'
+-- );
+
+-- AGENT: Expand this file with full mock data per MOCK_DATA_BLUEPRINT.md
+-- covering all 5 roles, handshake states, and DQS scenarios.
