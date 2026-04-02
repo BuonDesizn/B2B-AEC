@@ -69,9 +69,9 @@ This spec covers **in-app notifications only**. Real-time chat/messaging is out 
 
 ## Guardrail Checks
 
-- [ ] `check_handshake_privacy.md`: No PII exposed in notification payloads
-- [ ] `check_proximity_logic.md`: Not applicable
-- [ ] `check_company_dna.md`: Not applicable
+- [ ] **Handshake Privacy**: No PII exposed in notification payloads
+- [ ] **Proximity Logic**: Not applicable
+- [ ] **Company DNA**: Not applicable
 
 ## Definition of Done (DoD)
 

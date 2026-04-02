@@ -55,7 +55,7 @@ marketplace. All tables are optimized for `PostgreSQL 15+` with `PostGIS` and
 | `rfps` / `rfp_responses` | `RFP-001` | Quality-First (70/30) Discovery & Asynchronous RFP Broadcaster. |
 | `ads` / `ad_analytics` | `AD-001` | Geo-targeted hyper-local visibility for B2B. |
 | `subscriptions` | `MON-001` | National Pro Model (India-wide access control). |
-| `unmasking_audit` | `QA-001` | Compliance & Privacy (Immutable witness logs). |
+| `unmasking_audit` | `HD-001` | Compliance & Privacy (Immutable witness logs). |
 | `system_config` | `RM-001` | Dynamic Ranking Weights & DQS parameters. |
 
 ---

@@ -9,7 +9,7 @@ criticality: medium
 
 depends_on:
   - ARCHITECTURE
-  - ORCHESTRATION
+  - STATE_MACHINES
 
 consumes:
   - implementation_phases
@@ -117,9 +117,9 @@ The new system is built **on top of the legacy system** — each module must cle
 
 | Gate | Action | Source |
 | :--- | :--- | :--- |
-| **1. Parity** | Every mandatory field/flow from legacy UAT is reproduced or superseded | `legacy_audit/` |
-| **2. Gap** | The specific architectural fix for this module's legacy flaw is verified implemented | `GAP_ANALYSIS_SUMMARY.md` |
-| **3. Architecture** | Schema, state machines, and API contract match the spec docs | `db_schema.md`, `STATE_MACHINES.md`, `API_CONTRACT.md` |
+| **1. Parity** | Every mandatory field/flow from legacy UAT is reproduced or superseded | `docs/audit/` |
+| **2. Gap** | The specific architectural fix for this module's legacy flaw is verified implemented | `system/GAP_ANALYSIS_SUMMARY.md` |
+| **3. Architecture** | Schema, state machines, and API contract match the spec docs | `database/db_schema.md`, `system/STATE_MACHINES.md`, `api/API_CONTRACT.md` |
 | **4. Strategy** | Any interaction with DQS, privacy, or monetization passes the strategic guardrails | `strategy/2026-03-30-strategic-realignment-design.md` |
 
 > All four gates must pass before a module is handed to `quality-audit-specialist`.

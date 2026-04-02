@@ -432,7 +432,7 @@ QStash is used for all async, delayed, and retryable jobs. Events are emitted fr
 Base URL:      https://qstash.upstash.io/v2/publish/<handler-url>
 Authorization: Bearer $QSTASH_TOKEN
 Retry policy:  3 retries, exponential backoff (1s, 4s, 16s)
-Dead letter:   Log to Axiom after final retry failure
+Dead letter:   Log to Sentry after final retry failure
 ```
 
 Handler URLs are Next.js API routes at `/api/jobs/<event-name>`.

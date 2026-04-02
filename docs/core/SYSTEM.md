@@ -103,7 +103,7 @@ Every profile must map to one or more of these specialized personas:
 - **Privacy Core**: RLS + Server-Side Masking is the primary security layer.
 - **Geospatial Integrity**: All geography columns MUST have `GIST` indexes for performance.
 - **Latency Goal**: Discovery queries MUST target `<300ms` response times.
-- **Observability**: **Sentry** and **Axiom** tagging required for all "Handshake" event failures.
+- **Observability**: **Sentry** tagging required for all "Handshake" event failures.
 - **Next.js 15**: Use **PPR** (Partial Prerendering) for landing pages to optimize LCP.
 
 ---

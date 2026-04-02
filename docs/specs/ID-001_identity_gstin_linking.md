@@ -48,9 +48,9 @@ See: `docs/api/API_CONTRACT.md`
 
 ## Guardrail Checks (must all PASS before @qa marks GREEN)
 
-- [ ] `check_company_dna.md`: GSTIN binding verified, unmasking inheritance confirmed
-- [ ] `check_handshake_privacy.md`: Company personnel PII masked until ACCEPTED
-- [ ] `check_proximity_logic.md`: Not applicable for this spec
+- [ ] **Company DNA**: GSTIN binding verified, unmasking inheritance confirmed
+- [ ] **Handshake Privacy**: Company personnel PII masked until ACCEPTED
+- [ ] **Proximity Logic**: Not applicable for this spec
 
 ## Definition of Done (DoD)
 

@@ -35,19 +35,19 @@ Findings from the legacy audit (uat.buondesizn.com) have been addressed in the n
 ## 🛡️ Current Status of Critical Gaps
 
 ### 1️⃣ **API Contract Specification** ✅
-- **Resolution**: `/docs/API_CONTRACT.md` is now established, defining endpoints, payloads, and state-enforcement for the connection handshake and RFP cycles.
+- **Resolution**: `/docs/api/API_CONTRACT.md` is now established, defining endpoints, payloads, and state-enforcement for the connection handshake and RFP cycles.
 
 ### 2️⃣ **Business Logic Edge Cases** ✅
-- **Resolution**: `/docs/business_logic_edge_cases.md` defines failure modes, GSTIN validation regex, and state machine transitions for all roles.
+- **Resolution**: `/docs/business/business_logic_edge_cases.md` defines failure modes, GSTIN validation regex, and state machine transitions for all roles.
 
 ### 3️⃣ **Data Validation Rules** ✅
-- **Resolution**: Consolidated into `/docs/ARCHITECTURE.md` and enforced via `docs/db_schema.md` constraints.
+- **Resolution**: Consolidated into `/docs/core/ARCHITECTURE.md` and enforced via `docs/database/db_schema.md` constraints.
 
 ### 4️⃣ **Privacy Implementation** ✅
-- **Resolution**: `unmasking_audit` logic and RLS policies are specified in `/docs/db_schema.md` and `/docs/STATE_MACHINES.md`.
+- **Resolution**: `unmasking_audit` logic and RLS policies are specified in `/docs/database/db_schema.md` and `/docs/system/STATE_MACHINES.md`.
 
 ### 5️⃣ **Role-Specific Database Tables** ✅
-- **Resolution**: Specialized tables for Awards (Project Prof), **Key Personnel (Independent table with RLS)**, and Workforce/Fleet (Contractor/Dealer) are fully mapped in `/docs/db_schema.md`.
+- **Resolution**: Specialized tables for Awards (Project Prof), **Key Personnel (Independent table with RLS)**, and Workforce/Fleet (Contractor/Dealer) are fully mapped in `/docs/database/db_schema.md`.
 
 ---
 
@@ -79,17 +79,17 @@ Since the new system is built **on top of** the legacy system (not from scratch)
 
 | Layer | Source | Purpose |
 | :--- | :--- | :--- |
-| **Floor** (Parity) | `legacy_audit/` files | Minimum functional baseline — what must exist |
-| **Ceiling** (Improvement) | `strategy/`, `ARCHITECTURE.md`, design docs | How it must be built — locked decisions, no revisiting |
-| **Bridge** | This document (`GAP_ANALYSIS_SUMMARY.md`) | Per-module checklist: maps every legacy flaw to its architectural fix |
+| **Floor** (Parity) | `docs/audit/` files | Minimum functional baseline — what must exist |
+| **Ceiling** (Improvement) | `strategy/`, `core/ARCHITECTURE.md`, design docs | How it must be built — locked decisions, no revisiting |
+| **Bridge** | This document (`system/GAP_ANALYSIS_SUMMARY.md`) | Per-module checklist: maps every legacy flaw to its architectural fix |
 
 ### Module Sign-Off Sequence
 
 Before any module can be marked complete, confirm in order:
 
-1. **Parity Check** — Read the corresponding `legacy_audit/` file. Verify every mandatory field and UX baseline from legacy is reproduced or superseded.
+1. **Parity Check** — Read the corresponding `docs/audit/` file. Verify every mandatory field and UX baseline from legacy is reproduced or superseded.
 2. **Gap Check** — Find this module's entry in the "Resolved System Flaws" section above. Confirm the specific fix (RLS, PostGIS, etc.) is implemented, not just planned.
-3. **Architecture Check** — Verify schema matches `db_schema.md`, state transitions match `STATE_MACHINES.md`, API shape matches `API_CONTRACT.md`.
+3. **Architecture Check** — Verify schema matches `database/db_schema.md`, state transitions match `system/STATE_MACHINES.md`, API shape matches `api/API_CONTRACT.md`.
 4. **Strategic Guardrail Check** — If the module touches ranking (DQS), privacy (handshake/RLS), or monetization (credits/subscription), re-read the relevant section of `strategy/2026-03-30-strategic-realignment-design.md` before shipping.
 
 ### Anti-Pattern Warning

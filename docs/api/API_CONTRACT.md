@@ -9,7 +9,7 @@ criticality: high
 
 depends_on:
     - db_schema
-    - ORCHESTRATION
+    - STATE_MACHINES
 
 consumes:
     - endpoints
@@ -27,7 +27,7 @@ runtime:
     triggers:
         - on_external_request
     outputs_to:
-        - ORCHESTRATION
+        - STATE_MACHINES
         - db_schema
 
 version: 1.0
@@ -49,9 +49,9 @@ This includes:
 
 Derived strictly from:
 
-- db_schema.md
-- business_logic_edge_cases.md
-- ARCHITECTURE.md
+- `docs/database/db_schema.md`
+- `docs/business/business_logic_edge_cases.md`
+- `docs/core/ARCHITECTURE.md`
 
 ---
 
@@ -151,6 +151,55 @@ Fetch profile (masked if no connection)
 
 ---
 
+## PATCH /api/profiles/:id
+
+Update profile fields.
+
+### Request
+
+```json
+{
+    "org_name": "ABC Infra Pvt Ltd",
+    "tagline": "Structural Engineering Excellence",
+    "location": {
+        "lat": 18.5204,
+        "lng": 73.8567
+    },
+    "city": "Pune",
+    "state": "Maharashtra",
+    "address_line1": "123 MG Road",
+    "pincode": "411001",
+    "phone_primary": "+919876543210",
+    "email_business": "contact@abcinfra.com",
+    "linkedin_url": "https://linkedin.com/company/abcinfra"
+}
+```
+
+### Guards
+
+- `persona_type` is immutable — rejected if present in body.
+- `pan` is immutable after first save — rejected if changed.
+- GSTIN changes must use `/api/profiles/gstin-change-request`.
+- Caller must own the profile (`auth.uid() = id`).
+
+### Response
+
+```json
+{
+    "success": true,
+    "data": {
+        "id": "uuid",
+        "org_name": "ABC Infra Pvt Ltd",
+        "tagline": "Structural Engineering Excellence",
+        "location": { "lat": 18.5204, "lng": 73.8567 },
+        "verification_status": "VERIFIED",
+        "updated_at": "2026-04-02T10:00:00Z"
+    }
+}
+```
+
+---
+
 ## POST /api/profiles
 
 Create profile
@@ -176,6 +225,82 @@ Create profile
 - persona_type immutable after creation
 - GSTIN required for organizations
 - email uniqueness (active accounts only)
+
+---
+
+## GET /api/company-personnel
+
+List company personnel under caller's GSTIN.
+
+### Query Params
+
+- `is_active` (optional boolean — default true)
+- `page` (default 1)
+- `page_size` (default 20, max 50)
+
+### Guards
+
+- Caller must have a verified GSTIN.
+- Returns only personnel rows matching caller's `company_gstin`.
+- If caller has an ACCEPTED handshake with a GSTIN-matching profile, those personnel rows are also visible (Company DNA rule).
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "profile_id": "uuid",
+        "company_gstin": "27ABCDE1234F1Z5",
+        "full_name": "Ananya Sharma",
+        "designation": "Project Manager",
+        "qualification": "B.E. Civil",
+        "specialty": ["PMC", "Planning"],
+        "experience_years": 12,
+        "is_active": true,
+        "created_at": "2026-04-01T08:00:00Z"
+      }
+    ],
+    "meta": { "page": 1, "page_size": 20, "total_count": 1, "total_pages": 1 }
+  }
+}
+```
+
+---
+
+## GET /api/company-personnel/:id
+
+Fetch a single personnel record.
+
+### Guards
+
+- Caller must own the record (`profile_id = auth.uid()`) or have admin rights for that GSTIN, or have an ACCEPTED handshake with a GSTIN-matching profile.
+
+### Response
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "profile_id": "uuid",
+    "company_gstin": "27ABCDE1234F1Z5",
+    "full_name": "Ananya Sharma",
+    "designation": "Project Manager",
+    "qualification": "B.E. Civil",
+    "specialty": ["PMC", "Planning"],
+    "experience_years": 12,
+    "email": "person@example.com",
+    "phone": "+919999999999",
+    "detailed_bio": "...",
+    "profile_image_url": null,
+    "is_active": true
+  }
+}
+```
 
 ---
 
@@ -366,7 +491,96 @@ Initialize subscription payment
 
 ## POST /api/payment/phonepe/callback
 
-Handle payment response (Subscription Activation)
+Handle payment response from PhonePe webhook (Subscription Activation).
+
+### Request (PhonePe webhook POST body)
+
+```json
+{
+  "merchantId": "BUONDESIZN",
+  "merchantTransactionId": "txn_abc123",
+  "merchantOrderId": "order_xyz789",
+  "amount": 99900,
+  "state": "COMPLETED",
+  "responseCode": "SUCCESS",
+  "paymentInstrument": {
+    "type": "UPI",
+    "utr": "326987654321"
+  },
+  "transactionId": "T260402100000"
+}
+```
+
+### Guards
+
+- Verify webhook signature using PhonePe base64(SHA256(payload + salt)) + X-VERIFY header.
+- Idempotent: if `merchantTransactionId` already processed, return 200 with existing result.
+- On `state = COMPLETED`: set `subscriptions.status = 'active'`, `profiles.subscription_status = 'active'`, reset `handshake_credits = 30`, set `last_credit_reset_at = NOW()`.
+- On `state = FAILED`: set `subscriptions.status = 'expired'`, emit `PAYMENT_FAILED` notification.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "merchantTransactionId": "txn_abc123",
+    "status": "COMPLETED",
+    "subscription_activated": true
+  }
+}
+```
+
+---
+
+## POST /api/profiles/verify
+
+Submit profile for GSTIN/PAN verification.
+
+### Request
+
+```json
+{
+  "pan": "ABCDE1234F",
+  "gstin": "27ABCDE1234F1Z5",
+  "org_name": "ABC Infra Pvt Ltd",
+  "establishment_year": 2015
+}
+```
+
+### Guards
+
+- PAN regex: `^[A-Z]{5}[0-9]{4}[A-Z]{1}$`.
+- GSTIN regex: `^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$`.
+- PAN must not already be registered for the same `persona_type`.
+- GSTIN must not already be linked to another profile.
+- Transitions `verification_status` to `PENDING_ADMIN` on success.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "profile_id": "uuid",
+    "verification_status": "PENDING_ADMIN",
+    "pan": "ABCDE****F",
+    "gstin": "27ABCDE*****1Z5"
+  }
+}
+```
+
+### Error 409
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "IDENTITY_VERIFY_DUPLICATE_GSTIN",
+    "message": "GSTIN already linked to another profile"
+  }
+}
+```
 
 ---
 
@@ -497,6 +711,83 @@ Cancel RFP
 
 - pending responses → WITHDRAWN
 - notifications triggered
+
+---
+
+## POST /api/rfps/:id/invite
+
+Invite a specific profile to respond to an RFP.
+
+### Request
+
+```json
+{
+  "invitee_id": "uuid"
+}
+```
+
+### Guards
+
+- RFP must be `OPEN`.
+- Caller must be RFP creator.
+- Invitee's `persona_type` must match one of the RFP's `target_personas`.
+- Cannot invite the same profile twice (unique constraint on `rfp_invitations`).
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "invitation_id": "uuid",
+    "invitee_id": "uuid",
+    "status": "PENDING"
+  }
+}
+```
+
+### Events Triggered
+
+- `RFP_NEARBY` notification sent to invitee.
+
+---
+
+## GET /api/rfps/:id/responses
+
+List all responses for an RFP.
+
+### Guards
+
+- Caller must be RFP creator or a responder on this RFP.
+
+### Query Params
+
+- `status` (optional: `SUBMITTED|SHORTLISTED|ACCEPTED|REJECTED`)
+- `page` (default 1)
+- `page_size` (default 20, max 50)
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "responder_id": "uuid",
+        "responder_display_name": "ABC Consultants",
+        "proposal_text": "...",
+        "bid_amount": 500000.00,
+        "estimated_days": 30,
+        "status": "SUBMITTED",
+        "created_at": "2026-04-02T09:00:00Z"
+      }
+    ],
+    "meta": { "page": 1, "page_size": 20, "total_count": 3, "total_pages": 1 }
+  }
+}
+```
 
 ---
 
@@ -913,6 +1204,25 @@ Marks a notification as read.
 
 ---
 
+### PATCH /api/notifications/read-all
+
+Marks all unread notifications as read for the authenticated user.
+
+**Request**: `{}` (empty body)
+
+**Response 200**
+
+```json
+{
+  "success": true,
+  "data": { "marked_count": 7 }
+}
+```
+
+**Guards**: Caller must be authenticated. Only updates notifications where `recipient_id = auth.uid()` and `is_read = false`. Emits no events.
+
+---
+
 ### GET /api/profile/rate-limits
 
 Returns the current rate limit state for the authenticated user (credits remaining, requests this minute).
@@ -997,11 +1307,25 @@ Each API must emit events:
 
 - POST /api/connections → CONNECTION_REQUESTED
 - PATCH /api/connections/:id/accept → CONNECTION_ACCEPTED
+- PATCH /api/connections/:id/reject → CONNECTION_REJECTED
+- POST /api/connections/block → CONNECTION_BLOCKED
+- DELETE /api/connections/block/:target_id → CONNECTION_UNBLOCKED
 - POST /api/rfps → RFP_CREATED
 - POST /api/rfps/:id/respond → RFP_RESPONSE_SUBMITTED
+- POST /api/rfps/:id/invite → RFP_NEARBY
 - RFP close → RFP_CLOSED
+- RFP cancel → RFP_CLOSED
+- POST /api/rfps/:id/responses/:responseId/accept → RFP_RESPONSE_ACCEPTED
 - contact reveal → UNMASKING_TRIGGERED
 - POST /api/ads/:id/connect → CONNECTION_REQUESTED
+- POST /api/ads → AD_CREATED
+- POST /api/payment/phonepe/callback → PAYMENT_SUCCESS or PAYMENT_FAILED
+- POST /api/subscriptions/upgrade → SUBSCRIPTION_ACTIVATED
+- POST /api/subscriptions/schedule-downgrade → SUBSCRIPTION_DOWNGRADE_SCHEDULED
+- POST /api/moderation/:ad_id/clear → AD_APPROVED
+- POST /api/moderation/:ad_id/reject → AD_SUSPENDED
+- PATCH /api/notifications/:id/read → NOTIFICATION_READ
+- PATCH /api/notifications/read-all → NOTIFICATIONS_READ_ALL
 
 ---
 
@@ -1273,7 +1597,165 @@ Soft-delete equipment (`is_active = false`).
 
 ---
 
-# 14. GLOBAL STANDARDS
+# 14. MODERATION (MOD-001)
+_Spec: MOD-001 | Admin-only endpoints for ad content safety_
+
+---
+
+## GET /api/moderation/queue
+
+Admin-only: list flagged/suspended ads awaiting review.
+
+### Query Params
+
+- `status` (optional: `FLAGGED|SUSPENDED` — default both)
+- `page` (default 1)
+- `page_size` (default 20, max 50)
+
+### Guards
+
+- Caller must have `role = 'super_admin'`.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "title": "Hempcrete Blocks",
+        "image_url": "https://...",
+        "status": "SUSPENDED",
+        "moderation_status": "FLAGGED",
+        "profile_id": "uuid",
+        "created_at": "2026-04-02T08:00:00Z"
+      }
+    ],
+    "meta": { "page": 1, "page_size": 20, "total_count": 3, "total_pages": 1 }
+  }
+}
+```
+
+---
+
+## POST /api/moderation/:ad_id/clear
+
+Admin clears a flagged/suspended ad, restoring it to ACTIVE.
+
+### Request
+
+```json
+{ "notes": "string (optional)" }
+```
+
+### Guards
+
+- Caller must have `role = 'super_admin'`.
+- Ad must be in `SUSPENDED` or `FLAGGED` state.
+- If ad was previously paid, it resumes `ACTIVE` without re-payment.
+- Emits `AD_APPROVED` notification to ad creator.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "ad_id": "uuid",
+    "status": "ACTIVE",
+    "moderation_status": "APPROVED"
+  }
+}
+```
+
+---
+
+## POST /api/moderation/:ad_id/reject
+
+Admin rejects a flagged ad, keeping it SUSPENDED permanently.
+
+### Request
+
+```json
+{ "reason": "string", "notes": "string (optional)" }
+```
+
+### Guards
+
+- Caller must have `role = 'super_admin'`.
+- Ad must be in `SUSPENDED` or `FLAGGED` state.
+- Triggers refund flow if ad was paid.
+- Emits `AD_SUSPENDED` notification to ad creator.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "ad_id": "uuid",
+    "status": "SUSPENDED",
+    "moderation_status": "REJECTED"
+  }
+}
+```
+
+---
+
+# 15. ADS ANALYTICS
+_Spec: AD-001 | Read ad performance metrics_
+
+---
+
+## GET /api/ads/:id/analytics
+
+Returns analytics for a specific ad.
+
+### Query Params
+
+- `event_type` (optional: `IMPRESSION|CLICK|CONNECT` — default all)
+- `from` (optional ISO date — filter from)
+- `to` (optional ISO date — filter to)
+- `page` (default 1)
+- `page_size` (default 20, max 50)
+
+### Guards
+
+- Caller must own the ad (`profile_id = auth.uid()`).
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "ad_id": "uuid",
+    "summary": {
+      "impressions": 1250,
+      "clicks": 87,
+      "connects": 12,
+      "ctr": 0.0696
+    },
+    "items": [
+      {
+        "id": "uuid",
+        "event_type": "CLICK",
+        "viewer_lat": 18.5204,
+        "viewer_lng": 73.8567,
+        "distance_meters": 2500,
+        "created_at": "2026-04-02T10:30:00Z"
+      }
+    ],
+    "meta": { "page": 1, "page_size": 20, "total_count": 87, "total_pages": 5 }
+  }
+}
+```
+
+---
+
+# 16. GLOBAL STANDARDS
 
 ## 14.1 Pagination Standard
 

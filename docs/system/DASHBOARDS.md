@@ -9,7 +9,7 @@ criticality: high
 
 depends_on:
   - db_schema
-  - role_manual
+  - STATE_MACHINES
 
 consumes:
   - analytics

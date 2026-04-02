@@ -47,10 +47,10 @@ All changes to schema, API contracts, or state machines must follow this sequenc
 - State machine changes require `STATE_MACHINES.md` to be updated before any endpoint code.
 - No endpoint may bypass privacy, state enforcement, or contract alignment decisions.
 - `@qa` treats deviations from this protocol as blocking defects.
-- `MASTER_PROGRESS.md` cannot mark a module GREEN if any dependency violates this protocol.
+- No module can be marked GREEN if any dependency violates this protocol.
 
 ## Implementation Impact
 
 1. Any spec/contract/migration update must reference this file when changing naming or state values.
 2. `@qa` should treat deviations from locked decisions as blocking defects.
-3. `MASTER_PROGRESS.md` cannot mark a module GREEN if any dependency violates this matrix.
+3. No module can be marked GREEN if any dependency violates this matrix.

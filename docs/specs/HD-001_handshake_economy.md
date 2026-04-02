@@ -57,9 +57,9 @@ Key transitions to implement:
 
 ## Guardrail Checks
 
-- [ ] `check_handshake_privacy.md`: PII masked in default state, server-side enforcement confirmed
-- [ ] `check_company_dna.md`: GSTIN-wide unmask on single acceptance
-- [ ] `check_proximity_logic.md`: Not primary concern
+- [ ] **Handshake Privacy**: PII masked in default state, server-side enforcement confirmed
+- [ ] **Company DNA**: GSTIN-wide unmask on single acceptance
+- [ ] **Proximity Logic**: Not primary concern
 
 ## Definition of Done (DoD)
 

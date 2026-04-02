@@ -14,7 +14,7 @@ This skill defines the "Conscience" of the autonomous developer pipeline. ALL ag
 Agents must strictly follow the rules defined in the core documentation suite. Any conflict between local requirements and master docs is resolved in favor of the master docs.
 
 1.  🌌 **[SOUL.md](file:///Users/ssrrattan/Documents/b2b%20ref%20pc/docs/core/SOUL.md)**: Philosophical Principles (70/30 DQS Weighting, Handshake Economy).
-2.  ⚙️ **[SYSTEM.md](file:///Users/ssrrattan/Documents/b2b%20ref%20pc/docs/core/SYSTEM.md)**: Operational Framework & Engineering Standards (GIST, PPR, Axiom).
+2.  ⚙️ **[SYSTEM.md](file:///Users/ssrrattan/Documents/b2b%20ref%20pc/docs/core/SYSTEM.md)**: Operational Framework & Engineering Standards (GIST, PPR, Sentry).
 3.  📖 **[UBIQUITOUS_LANGUAGE.md](file:///Users/ssrrattan/Documents/b2b%20ref%20pc/docs/core/UBIQUITOUS_LANGUAGE.md)**: Master Glossary (5-Role Matrix, PAN/GSTIN Identity).
 
 ---

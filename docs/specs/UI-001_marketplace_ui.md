@@ -356,9 +356,9 @@ Based on `docs/audit/RFP_FLOW.md`:
 
 ## Guardrail Checks
 
-- [ ] `check_handshake_privacy.md`: Profile cards in masked state — PII fields NEVER in DOM, not CSS-hidden
-- [ ] `check_proximity_logic.md`: Results feed sorted by `ranked_score` DESC, `distance_km` shown as info only
-- [ ] `check_company_dna.md`: My Team page shows masked indicators for unconnected viewers; reveals on Company DNA match
+- [ ] **Handshake Privacy**: Profile cards in masked state — PII fields NEVER in DOM, not CSS-hidden
+- [ ] **Proximity Logic**: Results feed sorted by `ranked_score` DESC, `distance_km` shown as info only
+- [ ] **Company DNA**: My Team page shows masked indicators for unconnected viewers; reveals on Company DNA match
 
 ---
 
@@ -392,7 +392,7 @@ Based on `docs/audit/RFP_FLOW.md`:
 - E2E: After handshake ACCEPTED, card switches to unmasked without page reload
 - E2E: Hard lock overlay blocks navigation to `/discover`, `/rfps`, `/products`
 - E2E: Trial banner visible on dashboard, hidden after upgrade
-- E2E: Manual pin-drop updates search center (see `sdd_qa_test_spec.md` Pattern G)
+- E2E: Manual pin-drop updates search center (see Pattern G in implementation notes)
 - E2E: Mobile viewport (375px) renders bottom nav, not sidebar
 - E2E: Add Product form — submit with valid data, product appears in My Products
 

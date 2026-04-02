@@ -67,9 +67,9 @@ ranked_score = (w_quality × dqs_score) + (w_dist × (1 - LEAST(distance_km / ra
 
 ## Guardrail Checks
 
-- [ ] `check_proximity_logic.md`: 70/30 formula verified, GiST index present, <300ms latency confirmed
-- [ ] `check_company_dna.md`: Not primary concern but GSTIN-verified profiles must get verification boost
-- [ ] `check_handshake_privacy.md`: Search results must NOT include phone/email/linkedin regardless of connection status
+- [ ] **Proximity Logic**: 70/30 formula verified, GiST index present, <300ms latency confirmed
+- [ ] **Company DNA**: Not primary concern but GSTIN-verified profiles must get verification boost
+- [ ] **Handshake Privacy**: Search results must NOT include phone/email/linkedin regardless of connection status
 
 ## Definition of Done (DoD)
 
