@@ -10,16 +10,16 @@ This dashboard tracks planning-to-build traceability. Current state: ALL plannin
 | Discovery ranking (70/30) | `RM-001` | `ID-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
 | Handshake economy | `HD-001` | `ID-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
 | Marketplace UI shell | `UI-001` | `ID-001`, `RM-001`, `HD-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
-| Project Professional extension | `PP-001` | `ID-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Consultant extension | `C-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Contractor extension | `CON-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Product Seller extension | `PS-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Equipment Dealer extension | `ED-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| RFP lifecycle | `RFP-001` | `RM-001`, `HD-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Ads lifecycle and monetization | `AD-001` | `MON-001`, `RM-001`, `HD-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Subscription and credits | `MON-001` | `HD-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Communications and inbox orchestration | `COM-001` | `HD-001`, `RFP-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Moderation workflow | `MOD-001` | `AD-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
+| Project Professional extension | `PP-001` | `ID-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Consultant extension | `C-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Contractor extension | `CON-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Product Seller extension | `PS-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Equipment Dealer extension | `ED-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| RFP lifecycle | `RFP-001` | `RM-001`, `HD-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Ads lifecycle and monetization | `AD-001` | `MON-001`, `RM-001`, `HD-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Subscription and credits | `MON-001` | `HD-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Communications and inbox orchestration | `COM-001` | `HD-001`, `RFP-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Moderation workflow | `MOD-001` | `AD-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
 | AI discovery assist | `AI-001` | `RM-001` | PENDING | PENDING | PENDING | MISSING | PLANNED | 0% | GREY |
 | Analytics dashboards | `ANL-001` | `RM-001`, `RFP-001`, `AD-001`, `MON-001` | PENDING | PENDING | PENDING | MISSING | PLANNED | 0% | GREY |
 
