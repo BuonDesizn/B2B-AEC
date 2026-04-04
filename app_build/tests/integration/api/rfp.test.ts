@@ -170,7 +170,7 @@ describe('RFP API Integration', () => {
         body: JSON.stringify({ proposal: 'My proposal' }),
       });
 
-      const response = await POST(request, { params: { id: 'test-id' } });
+      const response = await POST(request, { params: Promise.resolve({ id: 'test-id' }) });
       const data = await response.json();
 
       expect(response.status).toBe(401);
@@ -184,7 +184,7 @@ describe('RFP API Integration', () => {
         body: JSON.stringify({}),
       });
 
-      const response = await POST(request, { params: { id: 'test-id' } });
+      const response = await POST(request, { params: Promise.resolve({ id: 'test-id' }) });
       const data = await response.json();
 
       expect(response.status).toBe(400);

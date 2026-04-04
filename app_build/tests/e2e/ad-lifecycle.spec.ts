@@ -33,7 +33,7 @@ test.describe('Phase 3: Ad Campaign Lifecycle', () => {
     await page.click('[data-testid="pay-ad-button"]');
     await expect(page.getByTestId('payment-modal')).toBeVisible();
     await page.fill('[data-testid="phonepe-phone"]', '+919876543210');
-    await page.click('[data-testid="phonepe-pay']');
+    await page.click('[data-testid="phonepe-pay"]');
     await expect(page).toHaveURL('/ads/payment/callback*');
   });
 

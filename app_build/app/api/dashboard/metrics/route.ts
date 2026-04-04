@@ -104,7 +104,7 @@ export async function GET(request: Request) {
         .executeTakeFirst();
 
       const activeAds = await db
-        .from('ads')
+        .selectFrom('ads')
         .select(db.fn.count('id').as('count'))
         .where('profile_id', '=', user.id)
         .where('status', '=', 'ACTIVE')
@@ -146,7 +146,7 @@ export async function GET(request: Request) {
         .executeTakeFirst();
 
       const activeAds = await db
-        .from('ads')
+        .selectFrom('ads')
         .select(db.fn.count('id').as('count'))
         .where('profile_id', '=', user.id)
         .where('status', '=', 'ACTIVE')
