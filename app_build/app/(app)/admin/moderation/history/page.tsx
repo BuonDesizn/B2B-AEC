@@ -3,8 +3,16 @@
 
 import { useState, useEffect } from 'react';
 
+interface ModHistory {
+  created_at: string;
+  ad_title?: string;
+  action: string;
+  admin_name?: string;
+  reason?: string;
+}
+
 export default function ModerationHistoryPage() {
-  const [history, setHistory] = useState<any[]>([]);
+  const [history, setHistory] = useState<ModHistory[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +47,7 @@ export default function ModerationHistoryPage() {
               </tr>
             </thead>
             <tbody>
-              {history.map((h: any, i: number) => (
+              {history.map((h: ModHistory, i: number) => (
                 <tr key={i} className="border-t border-border">
                   <td className="p-3">{new Date(h.created_at).toLocaleDateString()}</td>
                   <td className="p-3">{h.ad_title}</td>

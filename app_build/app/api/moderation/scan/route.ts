@@ -1,4 +1,6 @@
+// @witness [MOD-001]
 import { NextResponse } from 'next/server';
+
 import { moderationService } from '@/lib/services/moderation';
 
 export async function POST(request: Request) {

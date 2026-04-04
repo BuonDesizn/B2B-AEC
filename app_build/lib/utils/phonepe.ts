@@ -21,6 +21,11 @@ export function generateChecksum(payload: string, salt: string, saltIndex: strin
 }
 
 export function verifyCallbackSignature(payload: string, signature: string, salt: string): boolean {
+  // TODO: replace with full PhonePe signature verification before go-live.
+  // Current implementation bypasses signature check for local/test environments.
+  if (process.env.PHONEPE_SKIP_SIGNATURE_VERIFY === 'true') {
+    return true;
+  }
   const base64Payload = Buffer.from(payload).toString('base64');
   const expectedHash = crypto
     .createHash('sha256')

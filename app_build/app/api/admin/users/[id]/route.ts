@@ -1,14 +1,13 @@
 // @witness [ID-001]
 import { NextResponse } from 'next/server';
-import { requireAuth, AuthError } from '@/lib/auth';
+
+import { requireAdmin, AuthError } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await requireAuth(request);
+    const _user = await requireAdmin(request);
     const { id } = await params;
-    const adminProfile = await db.selectFrom('profiles').select('role').where('id', '=', user.id).executeTakeFirst();
-    if (adminProfile?.role !== 'admin') return NextResponse.json({ success: false, error: { code: 'FORBIDDEN', message: 'Admin access required' } }, { status: 403 });
 
     const profile = await db.selectFrom('profiles').selectAll().where('id', '=', id).executeTakeFirst();
     if (!profile) return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'User not found' } }, { status: 404 });
@@ -22,13 +21,19 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const user = await requireAuth(request);
+    const _user = await requireAdmin(request);
     const { id } = await params;
-    const adminProfile = await db.selectFrom('profiles').select('role').where('id', '=', user.id).executeTakeFirst();
-    if (adminProfile?.role !== 'admin') return NextResponse.json({ success: false, error: { code: 'FORBIDDEN', message: 'Admin access required' } }, { status: 403 });
 
     const body = await request.json();
-    const result = await db.updateTable('profiles').set(body).where('id', '=', id).returningAll().executeTakeFirstOrThrow();
+    const allowed = ['verification_status', 'org_name', 'subscription_status'] as const;
+    const update: Record<string, unknown> = {};
+    for (const key of allowed) {
+      if (key in body) update[key] = body[key];
+    }
+    if (Object.keys(update).length === 0) {
+      return NextResponse.json({ success: false, error: { code: 'VALIDATION_FAILED', message: 'No valid fields to update' } }, { status: 400 });
+    }
+    const result = await db.updateTable('profiles').set(update).where('id', '=', id).returningAll().executeTakeFirstOrThrow();
     return NextResponse.json({ success: true, data: result });
   } catch (error) {
     if (error instanceof AuthError) return NextResponse.json({ success: false, error: { code: error.code, message: error.message } }, { status: error.status });

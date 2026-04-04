@@ -1,17 +1,18 @@
 // @witness [ID-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { useMemo, useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { createClient } from '@/lib/supabase/client';
 
 export default function IntegrationsPage() {
   const [form, setForm] = useState({ linkedin_url: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     (async () => {
@@ -21,7 +22,7 @@ export default function IntegrationsPage() {
       if (data) setForm({ linkedin_url: data.linkedin_url || '' });
       setLoading(false);
     })();
-  }, []);
+  }, [supabase]);
 
   const handleSave = async () => {
     setSaving(true);

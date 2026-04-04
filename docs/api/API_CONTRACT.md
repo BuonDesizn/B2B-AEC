@@ -256,7 +256,7 @@ List company personnel under caller's GSTIN.
 
 ### Query Params
 
-- `is_active` (optional boolean — default true)
+- `include_deleted` (optional boolean — default false — set to `true` to include soft-deleted records)
 - `page` (default 1)
 - `page_size` (default 20, max 50)
 
@@ -282,7 +282,7 @@ List company personnel under caller's GSTIN.
         "qualification": "B.E. Civil",
         "specialty": ["PMC", "Planning"],
         "experience_years": 12,
-        "is_active": true,
+        "deleted_at": null,
         "created_at": "2026-04-01T08:00:00Z"
       }
     ],
@@ -319,7 +319,7 @@ Fetch a single personnel record.
     "phone": "+919999999999",
     "detailed_bio": "...",
     "profile_image_url": null,
-    "is_active": true
+    "deleted_at": null
   }
 }
 ```
@@ -374,7 +374,7 @@ Create company personnel record under caller's GSTIN.
     "phone": "+919999999999",
     "detailed_bio": "...",
     "profile_image_url": null,
-    "is_active": true
+    "deleted_at": null
   }
 }
 ```
@@ -393,7 +393,7 @@ Update an existing personnel record.
 
 ## DELETE /api/company-personnel/:id
 
-Soft-delete personnel row (`is_active = false`) for auditability.
+Soft-delete personnel row (sets `deleted_at = NOW()`) for auditability.
 
 ### Guards
 
@@ -635,7 +635,13 @@ Fetch profiles (National / Proximity)
 
 ## POST /api/rfps
 
-Create RFP (PS and ED roles CANNOT create RFPs — they can only send connections).
+Create RFP. PS and ED personas CANNOT create RFQs — they can only send connections.
+
+### Guards
+
+- Caller must be authenticated.
+- `persona_type` must be `PP`, `C`, or `CON`. Returns **403** with `RFQ_CREATE_PERSONA_UNAUTHORIZED` for `PS` or `ED`.
+- Caller must not be `hard_locked`.
 
 ### Request
 

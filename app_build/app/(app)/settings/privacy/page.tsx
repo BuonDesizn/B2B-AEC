@@ -1,8 +1,9 @@
+// @witness [UI-001]
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 interface BlockedUser {

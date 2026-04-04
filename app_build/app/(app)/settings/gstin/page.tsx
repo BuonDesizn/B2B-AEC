@@ -1,10 +1,11 @@
 // @witness [ID-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { useMemo, useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { createClient } from '@/lib/supabase/client';
 
 export default function GSTINChangePage() {
   const [currentGSTIN, setCurrentGSTIN] = useState('');
@@ -13,7 +14,7 @@ export default function GSTINChangePage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     (async () => {
@@ -23,7 +24,7 @@ export default function GSTINChangePage() {
       if (data) setCurrentGSTIN(data.gstin || '');
       setLoading(false);
     })();
-  }, []);
+  }, [supabase]);
 
   const handleSubmit = async () => {
     setSubmitting(true);

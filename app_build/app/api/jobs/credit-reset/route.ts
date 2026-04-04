@@ -1,5 +1,6 @@
 // @witness [MON-001]
 import { NextResponse } from 'next/server';
+
 import { verifyQStashSignature } from '@/lib/jobs';
 import { subscriptionService } from '@/lib/services/subscription';
 
@@ -9,7 +10,7 @@ import { subscriptionService } from '@/lib/services/subscription';
  */
 export async function POST(request: Request) {
   try {
-    if (!verifyQStashSignature(request)) {
+    if (!(await verifyQStashSignature(request))) {
       return NextResponse.json(
         { success: false, error: { code: 'AUTH_MISSING', message: 'Invalid QStash signature' } },
         { status: 401 }

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { discoveryService } from '@/lib/services/discovery';
 
 function createMockQueryBuilder(returnValue: any) {

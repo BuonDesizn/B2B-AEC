@@ -1,5 +1,6 @@
 // @witness [RFP-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { rfpService } from '@/lib/services/rfp';
 import { broadcastRFP } from '@/lib/services/rfp/broadcast';

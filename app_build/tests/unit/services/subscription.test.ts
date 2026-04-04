@@ -1,4 +1,5 @@
-import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import {
   canTransitionSubscription,
   subscriptionService,
@@ -26,7 +27,7 @@ vi.mock('@/lib/db', () => {
   const chain = createMockQueryBuilder({
     id: 'test-sub-id',
     profile_id: 'test-user',
-    status: 'TRIAL',
+    status: 'trial',
     plan: 'trial',
     amount: 0,
     created_at: new Date(),
@@ -37,7 +38,7 @@ vi.mock('@/lib/db', () => {
     db: {
       insertInto: vi.fn(() => chain),
       selectFrom: vi.fn(() => createMockQueryBuilder({
-        subscription_status: 'TRIAL',
+        subscription_status: 'trial',
         handshake_credits: 30,
         credits_reset_at: new Date(),
       })),
@@ -49,35 +50,35 @@ vi.mock('@/lib/db', () => {
 describe('Subscription State Machine', () => {
   describe('canTransitionSubscription', () => {
     it('allows TRIAL to ACTIVE', () => {
-      expect(canTransitionSubscription('TRIAL', 'ACTIVE')).toBe(true);
+      expect(canTransitionSubscription('trial', 'active')).toBe(true);
     });
 
     it('allows TRIAL to HARD_LOCKED', () => {
-      expect(canTransitionSubscription('TRIAL', 'HARD_LOCKED')).toBe(true);
+      expect(canTransitionSubscription('trial', 'hard_locked')).toBe(true);
     });
 
     it('allows ACTIVE to EXPIRED', () => {
-      expect(canTransitionSubscription('ACTIVE', 'EXPIRED')).toBe(true);
+      expect(canTransitionSubscription('active', 'expired')).toBe(true);
     });
 
     it('allows EXPIRED to ACTIVE', () => {
-      expect(canTransitionSubscription('EXPIRED', 'ACTIVE')).toBe(true);
+      expect(canTransitionSubscription('expired', 'active')).toBe(true);
     });
 
     it('allows HARD_LOCKED to ACTIVE', () => {
-      expect(canTransitionSubscription('HARD_LOCKED', 'ACTIVE')).toBe(true);
+      expect(canTransitionSubscription('hard_locked', 'active')).toBe(true);
     });
 
     it('does not allow ACTIVE to TRIAL', () => {
-      expect(canTransitionSubscription('ACTIVE', 'TRIAL')).toBe(false);
+      expect(canTransitionSubscription('active', 'trial')).toBe(false);
     });
 
     it('does not allow EXPIRED to TRIAL', () => {
-      expect(canTransitionSubscription('EXPIRED', 'TRIAL')).toBe(false);
+      expect(canTransitionSubscription('expired', 'trial')).toBe(false);
     });
 
     it('does not allow HARD_LOCKED to TRIAL', () => {
-      expect(canTransitionSubscription('HARD_LOCKED', 'TRIAL')).toBe(false);
+      expect(canTransitionSubscription('hard_locked', 'trial')).toBe(false);
     });
   });
 });
@@ -94,7 +95,7 @@ describe('Subscription Service', () => {
       });
 
       expect(result).toBeDefined();
-      expect(result.status).toBe('TRIAL');
+      expect(result.status).toBe('trial');
     });
   });
 
@@ -103,7 +104,7 @@ describe('Subscription Service', () => {
       const result = await subscriptionService.activate('test-user', 'payment-123');
 
       expect(result).toBeDefined();
-      expect(result.status).toBe('ACTIVE');
+      expect(result.status).toBe('active');
       expect(result.credits).toBe(30);
     });
   });
@@ -113,7 +114,7 @@ describe('Subscription Service', () => {
       vi.mocked(await import('@/lib/db')).db.selectFrom = vi.fn().mockReturnValue(
         createMockQueryBuilder({
           handshake_credits: 30,
-          subscription_status: 'HARD_LOCKED',
+          subscription_status: 'hard_locked',
           credits_reset_at: new Date(),
         })
       );
@@ -127,7 +128,7 @@ describe('Subscription Service', () => {
       vi.mocked(await import('@/lib/db')).db.selectFrom = vi.fn().mockReturnValue(
         createMockQueryBuilder({
           handshake_credits: 0,
-          subscription_status: 'ACTIVE',
+          subscription_status: 'active',
           credits_reset_at: new Date(),
         })
       );

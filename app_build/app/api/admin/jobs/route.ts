@@ -1,6 +1,7 @@
 // @witness [MON-001]
 import { NextResponse } from 'next/server';
-import { requireAuth, AuthError } from '@/lib/auth';
+
+import { requireAdmin, AuthError } from '@/lib/auth';
 
 const JOBS = [
   { name: 'RFP Expiry', description: 'Marks expired RFPs as EXPIRED', schedule: 'Every hour', status: 'Active' },
@@ -12,7 +13,7 @@ const JOBS = [
 
 export async function GET(request: Request) {
   try {
-    const user = await requireAuth(request);
+    await requireAdmin(request);
     return NextResponse.json({ success: true, data: JOBS });
   } catch (error) {
     if (error instanceof AuthError) return NextResponse.json({ success: false, error: { code: error.code, message: error.message } }, { status: error.status });

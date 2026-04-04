@@ -1,10 +1,11 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 const CATEGORIES = [
   'Earthmoving', 'Lifting', 'Concrete', 'Road Construction', 'Generator',
@@ -17,7 +18,6 @@ export default function AddEditEquipmentPage() {
   const equipmentId = searchParams.get('id');
   const isEditing = !!equipmentId;
 
-  const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEditing);
   const [saving, setSaving] = useState(false);
 

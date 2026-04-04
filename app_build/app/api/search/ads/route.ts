@@ -1,8 +1,9 @@
 // @witness [AD-001]
+import { sql } from 'kysely';
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { sql } from 'kysely';
 
 const DEFAULT_RADIUS_KM = 50;
 const MAX_RADIUS_KM = 500;

@@ -1,5 +1,6 @@
 // @witness [PS-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { productsService } from '@/lib/services/products';
 

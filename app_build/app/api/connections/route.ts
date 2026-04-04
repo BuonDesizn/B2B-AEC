@@ -1,5 +1,6 @@
 // @witness [HD-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { connectionService } from '@/lib/services/connections';
@@ -88,7 +89,7 @@ export async function GET(request: Request) {
     const page = parseInt(searchParams.get('page') ?? '1', 10);
     const page_size = parseInt(searchParams.get('page_size') ?? '20', 10);
 
-    let query = db
+    const query = db
       .selectFrom('connections')
       .selectAll()
       .where((eb) => {

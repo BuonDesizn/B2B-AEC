@@ -1,5 +1,7 @@
 import { redirect } from 'next/navigation';
+
 import { createServerClient } from '@/lib/supabase/server';
+
 import { Sidebar } from './sidebar';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {

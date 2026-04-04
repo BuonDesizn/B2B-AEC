@@ -1,12 +1,24 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price_per_unit?: number;
+  unit?: string;
+  min_order_quantity?: number;
+  available: boolean;
+}
 
 export default function MyProductsPage() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

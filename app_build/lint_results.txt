@@ -1,0 +1,452 @@
+
+> buondesizn-app@0.1.0 lint
+> eslint . --max-warnings=0
+
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/ads/[id]/page.tsx
+  12:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/audit/page.tsx
+   7:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  47:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/audit/unmasking/page.tsx
+   7:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/companies/page.tsx
+  9:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/config/plans/page.tsx
+   9:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  33:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/identity/page.tsx
+  10:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/moderation/history/page.tsx
+   7:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/moderation/page.tsx
+  10:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/page.tsx
+  8:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/payments/page.tsx
+   7:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/admin/users/[id]/page.tsx
+  14:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/discover/page.tsx
+   28:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  121:32  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/enquiries/page.tsx
+  17:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/equipment/page.tsx
+  10:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/firm/page.tsx
+  10:36  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+  11:46  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+  25:6   warning  React Hook useEffect has a missing dependency: 'supabase'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/my-equipment/page.tsx
+  10:46  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+  22:6   warning  React Hook useEffect has a missing dependency: 'supabase'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  39:31  warning  Unexpected any. Specify a different type                                                                     @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/onboarding/page.tsx
+  34:6  warning  React Hook useEffect has missing dependencies: 'router' and 'supabase.auth'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/onboarding/profile/page.tsx
+  33:6  warning  React Hook useEffect has missing dependencies: 'router' and 'supabase'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/payment/pending/page.tsx
+  15:6  warning  React Hook useEffect has a missing dependency: 'router'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/products/[id]/page.tsx
+  20:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/products/page.tsx
+  10:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/profile/page.tsx
+   2:10  error    'useRouter' is defined but never used     @typescript-eslint/no-unused-vars
+   9:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:41  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:67  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/profiles/[id]/page.tsx
+  12:42  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/rfps/[id]/page.tsx
+    3:10   error    'useRouter' is defined but never used     @typescript-eslint/no-unused-vars
+  229:59   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  377:138  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/rfps/[id]/responses/[responseId]/page.tsx
+   5:10  error    'useRouter' is defined but never used     @typescript-eslint/no-unused-vars
+  13:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/rfps/page.tsx
+  135:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/services/page.tsx
+   9:10  error    'createClient' is defined but never used  @typescript-eslint/no-unused-vars
+  12:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/settings/billing/page.tsx
+  17:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/settings/contact/page.tsx
+  32:6  warning  React Hook useEffect has a missing dependency: 'supabase'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/settings/gstin/page.tsx
+  27:6  warning  React Hook useEffect has a missing dependency: 'supabase'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/(app)/settings/integrations/page.tsx
+  25:6  warning  React Hook useEffect has a missing dependency: 'supabase'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/ads/[id]/route.ts
+   9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  26:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/audit/purge/execute/route.ts
+   9:11  error  '_user' is assigned a value but never used       @typescript-eslint/no-unused-vars
+  13:11  error  'entityType' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/audit/purge/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/audit/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/audit/unmasking/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/companies/[gstin]/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/companies/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/config/dqs/route.ts
+   9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  21:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/config/plans/route.ts
+   9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  21:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/config/route.ts
+   9:11  error    '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  21:11  error    '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  24:88  warning  Unexpected any. Specify a different type    @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/dashboard/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/dqs/recalc/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/identity/[id]/approve/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/identity/[id]/reject/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/identity/pending/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/moderation/history/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/payments/reconcile/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/payments/route.ts
+  9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/admin/users/[id]/route.ts
+   9:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  24:11  error  '_user' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/connections/route.ts
+   96:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  120:27  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/dashboard/metrics/route.ts
+  34:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/moderation/scan/route.ts
+  23:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/notifications/preferences/route.ts
+  34:13  error  'user_id' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/payment/phonepe/callback/route.ts
+  30:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/payment/phonepe/init/route.ts
+  33:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/profiles/[id]/route.ts
+  4:34  error  'getOptionalAuth' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/profiles/[role]/route.ts
+  32:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/api/profiles/me/route.ts
+  86:13  error  'id' is assigned a value but never used     @typescript-eslint/no-unused-vars
+  86:17  error  'email' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/auth/login/page.tsx
+  79:14  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/app/page.tsx
+  41:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/components/discovery/discovery-map.tsx
+  9:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/components/error-boundary.tsx
+  25:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/components/ui/image-upload.tsx
+   4:10  error    'Button' is defined but never used                                                                                                                                                                                                                                                       @typescript-eslint/no-unused-vars
+  65:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/auth.ts
+  57:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/db/types.ts
+  10:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/jobs.ts
+  35:54  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/ads/index.ts
+    1:61  error    'ERROR_CODES' is defined but never used      @typescript-eslint/no-unused-vars
+  318:11  error    'offset' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  327:22  warning  Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/company-personnel/index.ts
+  195:38  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/connections/index.ts
+  1:50  error  'ERROR_CODES' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/discovery/index.ts
+   68:44  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  236:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  256:34  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/equipment/index.ts
+   43:10  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  193:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/notifications/index.ts
+  101:29  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  252:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  290:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/payments/index.ts
+  107:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  218:5   warning  Unexpected console statement              no-console
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/products/index.ts
+   79:50  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  179:94  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/profiles/index.ts
+  228:38  warning  Unexpected any. Specify a different type                                   @typescript-eslint/no-explicit-any
+  332:77  error    'adminId' is defined but never used. Allowed unused args must match /^_/u  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/rfp/broadcast.ts
+  28:9  error  'radiusMeters' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/services/rfp/index.ts
+   1:10  error    'sql' is defined but never used           @typescript-eslint/no-unused-vars
+   7:6   error    'Rfp' is defined but never used           @typescript-eslint/no-unused-vars
+   8:6   error    'RfpResponse' is defined but never used   @typescript-eslint/no-unused-vars
+  59:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/lib/supabase/server.ts
+   6:82  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:86  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/middleware.ts
+  17:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  29:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/integration/api/rfp.test.ts
+  23:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  24:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  61:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/ads.test.ts
+    5:46  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+    6:16  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+   81:9   error    'hardLockedChain' is assigned a value but never used      @typescript-eslint/no-unused-vars
+   83:9   error    'activeAdChain' is assigned a value but never used        @typescript-eslint/no-unused-vars
+   84:9   error    'suspendedAdChain' is assigned a value but never used     @typescript-eslint/no-unused-vars
+   85:9   error    'pendingPaymentChain' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   86:9   error    'emptyChain' is assigned a value but never used           @typescript-eslint/no-unused-vars
+   99:35  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  134:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  149:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  178:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  199:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  220:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  241:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  250:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  273:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  294:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  315:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  324:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  347:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  369:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  391:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  400:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  434:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  439:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  461:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  482:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  504:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  531:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  553:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  575:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  596:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  605:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  629:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  652:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  674:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  683:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  706:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  732:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  760:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  769:25  warning  Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/connections.test.ts
+    8:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+    9:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  136:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  248:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  441:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  472:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/discovery.test.ts
+  5:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  6:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/equipment.test.ts
+    5:46  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+    6:16  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   23:41  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   75:9   error    'nonEdProfileChain' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   76:9   error    'hardLockedChain' is assigned a value but never used    @typescript-eslint/no-unused-vars
+   77:9   error    'emptyChain' is assigned a value but never used         @typescript-eslint/no-unused-vars
+   78:9   error    'unavailableChain' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  139:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  152:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  165:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  178:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  199:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  211:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  221:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  231:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  241:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  252:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  262:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  279:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  290:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  305:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  323:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  342:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  351:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  366:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  389:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  408:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  429:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  444:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  453:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  468:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/moderation.test.ts
+  8:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/notifications.test.ts
+    5:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+    6:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  156:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  163:49  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/payments.test.ts
+    7:7   error    'mockSelectFrom' is assigned a value but never used   @typescript-eslint/no-unused-vars
+    8:7   error    'mockUpdateTable' is assigned a value but never used  @typescript-eslint/no-unused-vars
+    9:7   error    'mockInsertInto' is assigned a value but never used   @typescript-eslint/no-unused-vars
+   11:7   error    'mockWhere' is assigned a value but never used        @typescript-eslint/no-unused-vars
+   12:7   error    'mockSelect' is assigned a value but never used       @typescript-eslint/no-unused-vars
+   15:7   error    'mockSet' is assigned a value but never used          @typescript-eslint/no-unused-vars
+   16:7   error    'mockReturnAll' is assigned a value but never used    @typescript-eslint/no-unused-vars
+   98:24  warning  Unexpected any. Specify a different type              @typescript-eslint/no-explicit-any
+  124:13  error    'tamperedPayload' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  165:22  error    A `require()` style import is forbidden               @typescript-eslint/no-require-imports
+  195:22  error    A `require()` style import is forbidden               @typescript-eslint/no-require-imports
+  230:22  error    A `require()` style import is forbidden               @typescript-eslint/no-require-imports
+  264:22  error    A `require()` style import is forbidden               @typescript-eslint/no-require-imports
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/products.test.ts
+    5:46  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+    6:16  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   23:41  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+   76:9   error    'nonPsProfileChain' is assigned a value but never used  @typescript-eslint/no-unused-vars
+   77:9   error    'hardLockedChain' is assigned a value but never used    @typescript-eslint/no-unused-vars
+   78:9   error    'emptyChain' is assigned a value but never used         @typescript-eslint/no-unused-vars
+   79:9   error    'unavailableChain' is assigned a value but never used   @typescript-eslint/no-unused-vars
+  142:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  157:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  172:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  193:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  205:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  215:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  225:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  236:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  246:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  263:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  274:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  289:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  307:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  326:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  335:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  350:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  375:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  390:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  399:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+  414:25  warning  Unexpected any. Specify a different type                @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/profiles.test.ts
+   9:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/rfp.test.ts
+   9:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  10:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  71:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ssrrattan/Documents/b2b ref pc/app_build/tests/unit/services/subscription.test.ts
+  8:46  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  9:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 261 problems (68 errors, 193 warnings)
+

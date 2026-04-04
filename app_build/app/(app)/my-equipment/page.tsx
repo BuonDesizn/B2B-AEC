@@ -2,21 +2,36 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
+import { createClient } from '@/lib/supabase/client';
+
+interface OwnedEquipment {
+  name: string;
+  category: string;
+  type?: string;
+  quantity: number | string;
+  available: boolean;
+  status: string;
+}
 
 export default function MyEquipmentPage() {
-  const [equipment, setEquipment] = useState<any[]>([]);
+  const [equipment, setEquipment] = useState<OwnedEquipment[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
+    const supabase = createClient();
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data } = await supabase.from('contractors').select('owned_equipment').eq('profile_id', user.id).single();
-      if (data?.owned_equipment) setEquipment(data.owned_equipment);
+      const { data } = await supabase
+        .from('contractors')
+        .select('owned_equipment')
+        .eq('profile_id', user.id)
+        .single();
+      if (data?.owned_equipment) {
+        setEquipment(data.owned_equipment as unknown as OwnedEquipment[]);
+      }
       setLoading(false);
     })();
   }, []);
@@ -36,7 +51,7 @@ export default function MyEquipmentPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {equipment.map((eq: any, i: number) => (
+          {equipment.map((eq: OwnedEquipment, i: number) => (
             <div key={i} className="rounded-lg border bg-card p-5 space-y-2">
               <h3 className="font-semibold">{eq.type || eq.category || 'Equipment'}</h3>
               <Badge variant={eq.available ? 'default' : 'secondary'}>{eq.available ? 'Available' : 'In Use'}</Badge>

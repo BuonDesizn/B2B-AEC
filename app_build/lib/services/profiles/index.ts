@@ -1,7 +1,8 @@
 // @witness [ID-001]
-import { db } from '@/lib/db';
 import { sql } from 'kysely';
+
 import { GSTIN_REGEX, PAN_REGEX, SUBSCRIPTION_STATUS, MONTHLY_CREDITS } from '@/lib/constants';
+import { db } from '@/lib/db';
 
 // =============================================================================
 // Verification State Machine
@@ -328,7 +329,7 @@ export const profileService = {
    * Admin verify profile
    * @witness [ID-001]
    */
-  async adminVerifyProfile(profileId: string, action: 'approve' | 'reject', adminId: string) {
+  async adminVerifyProfile(profileId: string, action: 'approve' | 'reject', _adminId: string) {
     const profile = await db
       .selectFrom('profiles')
       .select(['id', 'verification_status'])

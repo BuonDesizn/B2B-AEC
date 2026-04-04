@@ -1,5 +1,6 @@
 // @witness [HD-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { connectionService } from '@/lib/services/connections';
 

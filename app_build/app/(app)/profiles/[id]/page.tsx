@@ -1,10 +1,11 @@
 // @witness [UI-001]
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export default function MaskedProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);

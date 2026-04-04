@@ -3,8 +3,16 @@
 
 import { useState, useEffect } from 'react';
 
+interface UnmaskingLog {
+  created_at: string;
+  unmasker_id: string;
+  target_id: string;
+  mechanism: string;
+  revealed_fields?: string[];
+}
+
 export default function UnmaskingAuditPage() {
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs] = useState<UnmaskingLog[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -39,7 +47,7 @@ export default function UnmaskingAuditPage() {
               </tr>
             </thead>
             <tbody>
-              {logs.map((log: any, i: number) => (
+              {logs.map((log: UnmaskingLog, i: number) => (
                 <tr key={i} className="border-t border-border">
                   <td className="p-3">{new Date(log.created_at).toLocaleString()}</td>
                   <td className="p-3">{log.unmasker_id?.slice(0, 8)}</td>

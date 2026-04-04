@@ -1,8 +1,8 @@
 // @witness [MON-001]
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function PaymentPendingPage() {
   const router = useRouter();
@@ -12,7 +12,7 @@ export default function PaymentPendingPage() {
     const interval = setInterval(() => setSeconds(s => s + 1), 1000);
     const timeout = setTimeout(() => router.push('/payment/success'), 30000);
     return () => { clearInterval(interval); clearTimeout(timeout); };
-  }, []);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-[#F3F0F7] flex items-center justify-center p-4">

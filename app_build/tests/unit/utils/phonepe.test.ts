@@ -1,5 +1,7 @@
-// @witness [MON-001]
+import crypto from 'crypto';
+
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { generateChecksum, verifyCallbackSignature, buildPaymentPayload, getPhonePeBaseUrl } from '@/lib/utils/phonepe';
 
 vi.mock('@/lib/db', () => ({
@@ -34,7 +36,6 @@ describe('phonepe utils', () => {
       const result = generateChecksum(payload, salt, saltIndex);
 
       const base64Payload = Buffer.from(payload).toString('base64');
-      const crypto = require('crypto');
       const expectedHash = crypto
         .createHash('sha256')
         .update(base64Payload + salt + saltIndex)
@@ -68,7 +69,6 @@ describe('phonepe utils', () => {
     it('should return true for valid signature', () => {
       const payload = '{"state":"COMPLETED"}';
       const salt = 'test_salt';
-      const crypto = require('crypto');
       const base64Payload = Buffer.from(payload).toString('base64');
       const validSignature = crypto
         .createHash('sha256')
@@ -94,7 +94,6 @@ describe('phonepe utils', () => {
       const originalPayload = '{"state":"COMPLETED"}';
       const tamperedPayload = '{"state":"FAILED"}';
       const salt = 'test_salt';
-      const crypto = require('crypto');
       const base64Payload = Buffer.from(originalPayload).toString('base64');
       const signature = crypto
         .createHash('sha256')

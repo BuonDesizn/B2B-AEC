@@ -25,7 +25,7 @@ export async function broadcastRFP(rfpId: string) {
     return { broadcast_count: 0, reason: 'No project location set' };
   }
 
-  const radiusMeters = rfp.notification_radius_meters ?? 50000;
+  const _radiusMeters = rfp.notification_radius_meters ?? 50000;
   const targetPersonas = rfp.target_personas;
 
   // Find nearby profiles matching target personas

@@ -2,18 +2,30 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+
+interface Service {
+  id: string;
+  title: string;
+  description?: string;
+  price_per_hour?: number;
+  price_per_project?: number;
+  category: string;
+  subcategory?: string;
+  delivery_time_days?: number;
+  requires_site_visit: boolean;
+  is_active: boolean;
+}
 
 export default function ServicesPage() {
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', price_per_hour: '', price_per_project: '', category: '', subcategory: '', delivery_time_days: '', requires_site_visit: false });
   const [submitting, setSubmitting] = useState(false);
-  const supabase = createClient();
 
   useEffect(() => {
     fetch('/api/services', { credentials: 'include' })

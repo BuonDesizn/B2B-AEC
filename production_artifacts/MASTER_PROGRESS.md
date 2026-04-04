@@ -6,10 +6,10 @@ This dashboard tracks planning-to-build traceability. Current state: ALL plannin
 
 | Feature / Module | Spec ID | Depends On | Spec Doc | API Contract | Schema Alignment | Code Evidence (`@witness`) | Test Evidence | Progress | Final Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Identity and GSTIN linking | `ID-001` | - | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Discovery ranking (70/30) | `RM-001` | `ID-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Handshake economy | `HD-001` | `ID-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
-| Marketplace UI shell | `UI-001` | `ID-001`, `RM-001`, `HD-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
+| Identity and GSTIN linking | `ID-001` | - | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Discovery ranking (70/30) | `RM-001` | `ID-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Handshake economy | `HD-001` | `ID-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
+| Marketplace UI shell | `UI-001` | `ID-001`, `RM-001`, `HD-001` | DONE | DONE | DONE | ✅ DONE | ✅ DONE | 100% | GREEN |
 | Project Professional extension | `PP-001` | `ID-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
 | Consultant extension | `C-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |
 | Contractor extension | `CON-001` | `ID-001`, `RM-001` | DONE | DONE | DONE | MISSING | PLANNED | 100% | GREEN |

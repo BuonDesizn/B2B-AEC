@@ -1,5 +1,6 @@
 // @witness [RFP-001]
 import { NextResponse } from 'next/server';
+
 import { verifyQStashSignature } from '@/lib/jobs';
 import { rfpService } from '@/lib/services/rfp';
 
@@ -9,7 +10,7 @@ import { rfpService } from '@/lib/services/rfp';
  */
 export async function POST(request: Request) {
   try {
-    if (!verifyQStashSignature(request)) {
+    if (!(await verifyQStashSignature(request))) {
       return NextResponse.json(
         { success: false, error: { code: 'AUTH_MISSING', message: 'Invalid QStash signature' } },
         { status: 401 }

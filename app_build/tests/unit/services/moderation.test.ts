@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import {
   canTransitionModeration,
   moderationService,
@@ -39,7 +40,7 @@ vi.mock('@/lib/db', () => {
 });
 
 vi.mock('@/lib/services/moderation', async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = await importOriginal<typeof import('@/lib/services/moderation')>();
   return {
     ...actual,
     scanWithSightengine: vi.fn().mockResolvedValue({

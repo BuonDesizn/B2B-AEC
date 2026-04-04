@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -75,7 +76,7 @@ export default function LoginPage() {
         </div>
 
         <div className="text-center text-sm text-muted-foreground">
-          Don't have an account?{' '}
+          Don&apos;t have an account?{' '}
           <Link href="/auth/signup" className="text-primary hover:underline">
             Sign up
           </Link>

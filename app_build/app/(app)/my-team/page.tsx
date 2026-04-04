@@ -1,10 +1,11 @@
-// @witness [CON-001]
+// @witness [ID-001]
 'use client';
 
 import { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 interface Personnel {
   id: string;

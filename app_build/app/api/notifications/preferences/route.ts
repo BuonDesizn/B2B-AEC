@@ -1,5 +1,6 @@
 // @witness [COM-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { notificationService } from '@/lib/services/notifications';
 
@@ -30,7 +31,7 @@ export async function PATCH(request: Request) {
     const user = await requireAuth(request);
     const body = await request.json();
 
-    const { user_id, ...updates } = body;
+    const { user_id: _user_id, ...updates } = body;
 
     const prefs = await notificationService.updatePreferences(user.id, updates);
 

@@ -23,7 +23,6 @@ export interface UpdateServiceInput {
   delivery_time_days?: number;
   requires_site_visit?: boolean;
   images?: string[];
-  is_active?: boolean;
 }
 
 export const servicesService = {

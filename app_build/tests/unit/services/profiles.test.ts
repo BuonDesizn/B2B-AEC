@@ -1,5 +1,6 @@
 // @witness [ID-001]
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import {
   canTransitionVerification,
   profileService,
@@ -114,7 +115,7 @@ describe('Profile Service', () => {
       mockDb.insertInto = vi.fn(() => insertChain);
 
       const result = await profileService.createProfile(
-        { persona_type: 'CON', org_name: 'Test Corp', gstin: '27ABCDE1234F1Z5' },
+        { persona_type: 'CON', org_name: 'Test Corp', gstin: '27ABCDE1234F1Z5', pan: 'ABCDE1234F' },
         'user-1',
         'test@example.com'
       );
@@ -139,7 +140,7 @@ describe('Profile Service', () => {
       mockDb.insertInto = vi.fn(() => insertChain);
 
       const result = await profileService.createProfile(
-        { persona_type: 'PP', org_name: 'John Doe' },
+        { persona_type: 'PP', org_name: 'John Doe', gstin: undefined, pan: 'ABCDE1234F' },
         'user-2',
         'john@example.com'
       );
@@ -151,7 +152,7 @@ describe('Profile Service', () => {
     it('throws IDENTITY_VERIFY_INVALID_GSTIN when org missing GSTIN', async () => {
       await expect(
         profileService.createProfile(
-          { persona_type: 'CON', org_name: 'Test Corp' },
+          { persona_type: 'CON', org_name: 'Test Corp', pan: 'ABCDE1234F' },
           'user-1',
           'test@example.com'
         )
@@ -161,7 +162,7 @@ describe('Profile Service', () => {
     it('throws IDENTITY_VERIFY_INVALID_GSTIN for invalid GSTIN format', async () => {
       await expect(
         profileService.createProfile(
-          { persona_type: 'CON', org_name: 'Test Corp', gstin: 'INVALID' },
+          { persona_type: 'CON', org_name: 'Test Corp', gstin: 'INVALID', pan: 'ABCDE1234F' },
           'user-1',
           'test@example.com'
         )
@@ -275,6 +276,7 @@ describe('Profile Service', () => {
 
       expect(result).toBeDefined();
       expect(result.org_name).toBe('Updated Corp');
+      expect(callCount).toBe(1);
     });
 
     it('throws AUTH_INSUFFICIENT_ROLE when not owner', async () => {

@@ -1,5 +1,6 @@
 // @witness [MOD-001]
 import { NextResponse } from 'next/server';
+
 import { requireAdmin, AuthError } from '@/lib/auth';
 import { moderationService } from '@/lib/services/moderation';
 

@@ -1,7 +1,8 @@
+// @witness [UI-001]
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 interface MetricCard {
   label: string;

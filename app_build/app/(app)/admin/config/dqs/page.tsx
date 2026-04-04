@@ -2,6 +2,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 
 export default function DQSConfigPage() {
@@ -12,7 +13,10 @@ export default function DQSConfigPage() {
   useEffect(() => {
     fetch('/api/admin/config/dqs', { credentials: 'include' })
       .then(res => res.json())
-      .then(data => { if (data.success) setConfig(data.data); setLoading(false); })
+      .then(data => { 
+        if (data.success) setConfig(data.data); 
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
@@ -39,13 +43,13 @@ export default function DQSConfigPage() {
         <div>
           <label className="text-sm font-medium mb-1 block">Quality Weight: {config.quality_weight}</label>
           <input type="range" min="0" max="1" step="0.05" value={config.quality_weight}
-            onChange={e => setConfig(prev => ({ quality_weight: parseFloat(e.target.value), distance_weight: 1 - parseFloat(e.target.value) }))}
+            onChange={e => setConfig(_prev => ({ quality_weight: parseFloat(e.target.value), distance_weight: 1 - parseFloat(e.target.value) }))}
             className="w-full" />
         </div>
         <div>
           <label className="text-sm font-medium mb-1 block">Distance Weight: {config.distance_weight}</label>
           <input type="range" min="0" max="1" step="0.05" value={config.distance_weight}
-            onChange={e => setConfig(prev => ({ quality_weight: 1 - parseFloat(e.target.value), distance_weight: parseFloat(e.target.value) }))}
+            onChange={e => setConfig(_prev => ({ quality_weight: 1 - parseFloat(e.target.value), distance_weight: parseFloat(e.target.value) }))}
             className="w-full" />
         </div>
         <Button onClick={handleSave} disabled={saving}>{saving ? 'Saving...' : 'Save Weights'}</Button>

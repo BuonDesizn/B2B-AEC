@@ -1,10 +1,11 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 interface RfpDetail {
   id: string;
@@ -58,7 +59,6 @@ const formatINR = (val: number | null) => {
 };
 
 export default function RFPDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter();
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
   const [rfp, setRfp] = useState<RfpDetail | null>(null);
   const [responses, setResponses] = useState<RfpResponse[]>([]);

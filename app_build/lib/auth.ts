@@ -1,4 +1,5 @@
 // @witness [ID-001]
+import { db } from './db';
 import { createApiClient } from './supabase/server';
 
 export class AuthError extends Error {
@@ -81,14 +82,20 @@ export async function getOptionalAuth(request: Request): Promise<AuthUser | null
  */
 export async function requireAdmin(request: Request): Promise<AuthUser> {
   const user = await requireAuth(request);
-  
-  if (user.role !== 'super_admin') {
+
+  const profile = await db
+    .selectFrom('profiles')
+    .select('role')
+    .where('id', '=', user.id)
+    .executeTakeFirst();
+
+  if (profile?.role !== 'super_admin') {
     throw new AuthError(
       'AUTH_INSUFFICIENT_ROLE',
       403,
       'Admin access required'
     );
   }
-  
+
   return user;
 }

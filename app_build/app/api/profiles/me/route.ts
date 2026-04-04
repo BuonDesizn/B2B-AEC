@@ -1,5 +1,6 @@
 // @witness [ID-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { db } from '@/lib/db';
 
@@ -82,7 +83,7 @@ export async function PATCH(request: Request) {
     const user = await requireAuth(request);
     const body = await request.json();
 
-    const { id, email, persona_type, role_extension, ...updateData } = body;
+    const { id: _id, email: _email, persona_type, role_extension, ...updateData } = body;
 
     const profile = await db
       .updateTable('profiles')

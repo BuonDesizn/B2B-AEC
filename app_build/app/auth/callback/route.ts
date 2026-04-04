@@ -1,6 +1,7 @@
-import { createServerClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
+
+import { createServerClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);

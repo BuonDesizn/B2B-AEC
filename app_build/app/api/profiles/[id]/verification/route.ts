@@ -1,5 +1,6 @@
 // @witness [ID-001]
 import { NextResponse } from 'next/server';
+
 import { requireAdmin, AuthError } from '@/lib/auth';
 import { profileService } from '@/lib/services/profiles';
 

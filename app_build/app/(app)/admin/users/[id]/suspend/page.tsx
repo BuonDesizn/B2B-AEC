@@ -1,8 +1,9 @@
 // @witness [ID-001]
 'use client';
 
-import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 
 export default function SuspendUserPage({ params }: { params: Promise<{ id: string }> }) {

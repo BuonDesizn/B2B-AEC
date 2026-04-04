@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { adsService } from '@/lib/services/ads';
 
 function createMockQueryBuilder(returnValue: any) {
@@ -77,12 +78,12 @@ vi.mock('@/lib/db', () => {
 
   const chain = createMockQueryBuilder(mockAd);
   const profileChain = createMockQueryBuilder(mockProfile);
-  const hardLockedChain = createMockQueryBuilder(mockHardLockedProfile);
+  const _hardLockedChain = createMockQueryBuilder(mockHardLockedProfile);
   const connectionChain = createMockQueryBuilder(mockConnection);
-  const activeAdChain = createMockQueryBuilder(mockActiveAd);
-  const suspendedAdChain = createMockQueryBuilder(mockSuspendedAd);
-  const pendingPaymentChain = createMockQueryBuilder(mockPendingPaymentAd);
-  const emptyChain = createMockQueryBuilder(undefined);
+  const _activeAdChain = createMockQueryBuilder(mockActiveAd);
+  const _suspendedAdChain = createMockQueryBuilder(mockSuspendedAd);
+  const _pendingPaymentChain = createMockQueryBuilder(mockPendingPaymentAd);
+  const _emptyChain = createMockQueryBuilder(undefined);
 
   return {
     db: {

@@ -56,6 +56,18 @@ Ensure these are set in Vercel:
 - `SIGHTENGINE_API_USER` - Content moderation API user
 - `SIGHTENGINE_API_SECRET` - Content moderation API secret
 
+## Security
+
+`verifyQStashSignature()` is an `async` function. All job route handlers **must** `await` it:
+
+```typescript
+// ✅ correct
+if (!(await verifyQStashSignature(request))) { return 401 }
+
+// ❌ wrong — Promise is always truthy, gate never fires
+if (!verifyQStashSignature(request)) { return 401 }
+```
+
 ## Monitoring
 
 - Check job execution logs in QStash dashboard

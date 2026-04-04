@@ -1,11 +1,12 @@
 // @witness [ED-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Equipment {
   id: string;
@@ -30,13 +31,20 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { params.then(p => setResolvedParams(p)); }, [params]);
+  useEffect(() => {
+    params.then(p => setResolvedParams(p));
+  }, [params]);
 
   useEffect(() => {
     if (!resolvedParams) return;
     fetch(`/api/equipment/${resolvedParams.id}`, { credentials: 'include' })
       .then(res => res.json())
-      .then(data => { if (data.success) setEquipment(data.data); setLoading(false); })
+      .then(data => {
+        if (data.success) {
+          setEquipment(data.data);
+        }
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, [resolvedParams]);
 
@@ -47,17 +55,30 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
   };
 
   if (loading) return <div className="h-48 bg-muted rounded animate-pulse" />;
-  if (!equipment) return <div className="text-center py-12"><p className="text-lg text-muted-foreground">Equipment not found</p><Link href="/equipment"><Button className="mt-4">Back to Equipment</Button></Link></div>;
+  if (!equipment) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-lg text-muted-foreground">Equipment not found</p>
+        <Link href="/equipment">
+          <Button className="mt-4">Back to Equipment</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <Link href="/equipment" className="text-muted-foreground hover:text-foreground">← Back</Link>
+          <Link href="/equipment" className="text-muted-foreground hover:text-foreground">
+            ← Back
+          </Link>
           <h1 className="text-2xl font-bold font-[var(--font-playfair)]">{equipment.name}</h1>
         </div>
         <div className="flex gap-2">
-          <Link href={`/equipment/${equipment.id}/edit`}><Button variant="outline" size="sm">Edit</Button></Link>
+          <Link href={`/equipment/${equipment.id}/edit`}>
+            <Button variant="outline" size="sm">Edit</Button>
+          </Link>
           <Button variant="destructive" size="sm" onClick={handleDelete}>Delete</Button>
         </div>
       </div>
@@ -68,7 +89,9 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
             <h2 className="text-xl font-semibold">{equipment.name}</h2>
             <p className="text-sm text-muted-foreground mt-1">{equipment.category}</p>
           </div>
-          <Badge variant={equipment.status === 'ACTIVE' ? 'default' : 'secondary'}>{equipment.status}</Badge>
+          <Badge variant={equipment.is_active ? 'default' : 'secondary'}>
+            {equipment.is_active ? 'Active' : 'Inactive'}
+          </Badge>
         </div>
 
         {equipment.description && (
@@ -79,10 +102,30 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
         )}
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-          {equipment.monthly_rate && <div><p className="font-medium">Monthly Rate</p><p className="text-muted-foreground">₹{equipment.monthly_rate.toLocaleString('en-IN')}</p></div>}
-          {equipment.daily_rate && <div><p className="font-medium">Daily Rate</p><p className="text-muted-foreground">₹{equipment.daily_rate.toLocaleString('en-IN')}</p></div>}
-          {equipment.weekly_rate && <div><p className="font-medium">Weekly Rate</p><p className="text-muted-foreground">₹{equipment.weekly_rate.toLocaleString('en-IN')}</p></div>}
-          {equipment.location && <div><p className="font-medium">Location</p><p className="text-muted-foreground">{equipment.location}</p></div>}
+          {equipment.monthly_rate && (
+            <div>
+              <p className="font-medium">Monthly Rate</p>
+              <p className="text-muted-foreground">₹{equipment.monthly_rate.toLocaleString('en-IN')}</p>
+            </div>
+          )}
+          {equipment.daily_rate && (
+            <div>
+              <p className="font-medium">Daily Rate</p>
+              <p className="text-muted-foreground">₹{equipment.daily_rate.toLocaleString('en-IN')}</p>
+            </div>
+          )}
+          {equipment.weekly_rate && (
+            <div>
+              <p className="font-medium">Weekly Rate</p>
+              <p className="text-muted-foreground">₹{equipment.weekly_rate.toLocaleString('en-IN')}</p>
+            </div>
+          )}
+          {equipment.location && (
+            <div>
+              <p className="font-medium">Location</p>
+              <p className="text-muted-foreground">{equipment.location}</p>
+            </div>
+          )}
         </div>
 
         {equipment.type && (
@@ -96,15 +139,22 @@ export default function EquipmentDetailPage({ params }: { params: Promise<{ id: 
           <div>
             <p className="font-medium text-sm mb-1">Features</p>
             <div className="flex flex-wrap gap-1">
-              {equipment.features.map((f, i) => <Badge key={i} variant="outline" className="text-xs">{f}</Badge>)}
+              {equipment.features.map((f, i) => (
+                <Badge key={i} variant="outline" className="text-xs">{f}</Badge>
+              ))}
             </div>
           </div>
         )}
 
         <div className="flex gap-4 text-sm">
-          <Badge variant={equipment.available ? 'default' : 'secondary'}>{equipment.available ? 'Available' : 'Unavailable'}</Badge>
-          <Badge variant={equipment.operator_included ? 'default' : 'outline'}>{equipment.operator_included ? 'Operator Included' : 'No Operator'}</Badge>
+          <Badge variant={equipment.available ? 'default' : 'secondary'}>
+            {equipment.available ? 'Available' : 'Unavailable'}
+          </Badge>
+          <Badge variant={equipment.operator_included ? 'default' : 'outline'}>
+            {equipment.operator_included ? 'Operator Included' : 'No Operator'}
+          </Badge>
         </div>
+
 
         <p className="text-xs text-muted-foreground">Created {new Date(equipment.created_at).toLocaleDateString()}</p>
       </div>

@@ -1,6 +1,8 @@
+// @witness [UI-001]
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 
 interface Invoice {

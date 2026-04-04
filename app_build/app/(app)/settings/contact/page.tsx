@@ -1,17 +1,18 @@
 // @witness [COM-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
+import { useMemo, useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { createClient } from '@/lib/supabase/client';
 
 export default function ContactPreferencesPage() {
   const [form, setForm] = useState({ phone_primary: '', phone_secondary: '', email_business: '', linkedin_url: '' });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     (async () => {
@@ -28,7 +29,7 @@ export default function ContactPreferencesPage() {
       }
       setLoading(false);
     })();
-  }, []);
+  }, [supabase]);
 
   const update = (field: string, value: string) => setForm(prev => ({ ...prev, [field]: value }));
 

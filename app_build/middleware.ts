@@ -1,6 +1,6 @@
+import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
 
 // This middleware protects routes that require authentication
 export async function middleware(request: NextRequest) {

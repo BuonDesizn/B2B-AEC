@@ -3,8 +3,16 @@
 
 import { useState, useEffect } from 'react';
 
+interface AuditLog {
+  created_at: string;
+  entity_type?: string;
+  action: string;
+  user_id?: string;
+  details?: Record<string, any>;
+}
+
 export default function AuditExplorerPage() {
-  const [logs, setLogs] = useState<any[]>([]);
+  const [logs, setLogs] = useState<AuditLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
 
@@ -44,7 +52,7 @@ export default function AuditExplorerPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((log: any, i: number) => (
+              {filtered.map((log: AuditLog, i: number) => (
                 <tr key={i} className="border-t border-border">
                   <td className="p-3 whitespace-nowrap">{new Date(log.created_at).toLocaleString()}</td>
                   <td className="p-3">{log.entity_type || '-'}</td>

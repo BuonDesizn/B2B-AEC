@@ -1,16 +1,33 @@
 // @witness [ID-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+interface UserData {
+  id: string;
+  org_name?: string;
+  persona_type: string;
+  city?: string;
+  subscription_status: string;
+  email?: string;
+  phone_primary?: string;
+  pan?: string;
+  gstin?: string;
+  verification_status: string;
+  dqs_score?: number;
+  handshake_credits: number;
+  created_at: string;
+}
 
 export default function AdminUserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const [suspendReason, setSuspendReason] = useState('');
 

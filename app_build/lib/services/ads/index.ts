@@ -1,7 +1,6 @@
-import { db } from '@/lib/db';
-import { AD_STATUS, SUBSCRIPTION_STATUS, CONNECTION_STATUS, ERROR_CODES, MODERATION_STATUS } from '@/lib/constants';
-
 // @witness [AD-001]
+import { AD_STATUS, SUBSCRIPTION_STATUS, CONNECTION_STATUS, MODERATION_STATUS } from '@/lib/constants';
+import { db } from '@/lib/db';
 
 // =============================================================================
 // Ads State Machine
@@ -315,7 +314,7 @@ export const adsService = {
 
     const page = filters.page ?? 1;
     const pageSize = Math.min(filters.page_size ?? 20, 50);
-    const offset = (page - 1) * pageSize;
+    const _offset = (page - 1) * pageSize;
 
     const summary = {
       impressions: ad.impressions ?? 0,

@@ -1,14 +1,13 @@
 // @witness [C-001]
 import { NextResponse } from 'next/server';
-import { requireAuth, AuthError } from '@/lib/auth';
+
+import { requireAdmin, AuthError } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export async function GET(request: Request, { params }: { params: Promise<{ gstin: string }> }) {
   try {
-    const user = await requireAuth(request);
+    const _user = await requireAdmin(request);
     const { gstin } = await params;
-    const adminProfile = await db.selectFrom('profiles').select('role').where('id', '=', user.id).executeTakeFirst();
-    if (adminProfile?.role !== 'admin') return NextResponse.json({ success: false, error: { code: 'FORBIDDEN', message: 'Admin access required' } }, { status: 403 });
 
     const company = await db.selectFrom('profiles').selectAll().where('gstin', '=', gstin).executeTakeFirst();
     if (!company) return NextResponse.json({ success: false, error: { code: 'NOT_FOUND', message: 'Company not found' } }, { status: 404 });

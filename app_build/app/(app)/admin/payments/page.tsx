@@ -3,8 +3,17 @@
 
 import { useState, useEffect } from 'react';
 
+interface Payment {
+  created_at: string;
+  user_id?: string;
+  amount: number;
+  type: string;
+  status: string;
+  phonepe_txn_id?: string;
+}
+
 export default function AdminPaymentsPage() {
-  const [payments, setPayments] = useState<any[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -40,7 +49,7 @@ export default function AdminPaymentsPage() {
               </tr>
             </thead>
             <tbody>
-              {payments.map((p: any, i: number) => (
+              {payments.map((p: Payment, i: number) => (
                 <tr key={i} className="border-t border-border">
                   <td className="p-3">{new Date(p.created_at).toLocaleDateString()}</td>
                   <td className="p-3">{p.user_id?.slice(0, 8)}</td>

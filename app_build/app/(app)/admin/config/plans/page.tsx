@@ -2,10 +2,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 
+interface Plan {
+  id: string;
+  name: string;
+  price_monthly?: number;
+  handshake_credits?: number;
+  max_rfps?: number;
+  max_ads?: number;
+}
+
 export default function PlansConfigPage() {
-  const [plans, setPlans] = useState<any[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,7 +39,7 @@ export default function PlansConfigPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {plans.map((plan: any) => (
+          {plans.map((plan: Plan) => (
             <div key={plan.id} className="rounded-lg border bg-card p-6 space-y-3">
               <h3 className="font-semibold text-lg">{plan.name}</h3>
               <p className="text-2xl font-bold">₹{plan.price_monthly?.toLocaleString('en-IN')}/mo</p>

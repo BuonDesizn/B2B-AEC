@@ -1,9 +1,10 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 type RfpStatus = 'DRAFT' | 'OPEN' | 'CLOSED' | 'CANCELLED' | 'EXPIRED';
 
@@ -35,7 +36,6 @@ const statusBadgeVariant = (status: RfpStatus) => {
 };
 
 export default function MyRFPsPage() {
-  const router = useRouter();
   const [rfps, setRfps] = useState<Rfp[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');

@@ -1,4 +1,6 @@
 import * as React from "react";
+
+import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 
 interface ModalProps {
@@ -17,14 +19,12 @@ const Modal = ({ children, trigger, title, description }: ModalProps) => {
           {title && <DialogTitle>{title}</DialogTitle>}
           {description && <DialogDescription>{description}</DialogDescription>}
         </DialogHeader>
-        <DialogContent className="space-y-4">{children}</DialogContent>
+        <div className="space-y-4">{children}</div>
         <DialogFooter>
           <DialogTrigger asChild>
-            <button variant="outline" onClick={() => {
-              // Close dialog logic would go here
-            }}>
+            <Button variant="outline">
               Close
-            </button>
+            </Button>
           </DialogTrigger>
         </DialogFooter>
       </DialogContent>

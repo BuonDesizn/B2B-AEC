@@ -1,11 +1,11 @@
+// @witness [UI-001]
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 export default function ProfilePage() {
-  const router = useRouter();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -63,7 +63,6 @@ export default function ProfilePage() {
       <div className="space-y-4">
         <div><label className="text-sm font-medium mb-1 block">Organisation Name</label><Input value={profile.org_name || ''} onChange={e => update('org_name', e.target.value)} /></div>
         <div><label className="text-sm font-medium mb-1 block">Email</label><Input value={profile.email || ''} disabled className="bg-muted" /></div>
-        <div><label className="text-sm font-medium mb-1 block">Organisation Name</label><Input value={profile.org_name || ''} onChange={e => update('org_name', e.target.value)} /></div>
         <div><label className="text-sm font-medium mb-1 block">Mobile</label><Input value={profile.phone_primary || ''} onChange={e => update('phone_primary', e.target.value)} /></div>
         <div><label className="text-sm font-medium mb-1 block">About</label><textarea className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={profile.tagline || ''} onChange={e => update('tagline', e.target.value)} /></div>
 

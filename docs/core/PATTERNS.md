@@ -263,7 +263,9 @@ export async function requireAuth(request: Request) {
 
 export async function requireAdmin(request: Request) {
   const user = await requireAuth(request)
-  if (user.role !== 'super_admin') {
+  // Role is read from the DB, not the JWT, to avoid stale claims
+  const profile = await db.selectFrom('profiles').select('role').where('id', '=', user.id).executeTakeFirst()
+  if (profile?.role !== 'super_admin') {
     throw new AuthError('AUTH_INSUFFICIENT_ROLE', 403, 'Admin access required')
   }
   return user

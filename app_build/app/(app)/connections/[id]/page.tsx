@@ -1,10 +1,11 @@
+// @witness [UI-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface ConnectionDetail {
   id: string;
@@ -40,7 +41,6 @@ const statusColors: Record<string, string> = {
 };
 
 export default function ConnectionDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter();
   const [connection, setConnection] = useState<ConnectionDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [blockLoading, setBlockLoading] = useState(false);

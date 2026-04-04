@@ -30,9 +30,14 @@ export interface UpdatePersonnelInput {
 }
 
 export interface ListPersonnelFilters {
+  include_deleted?: boolean;
   is_active?: boolean;
   page?: number;
   page_size?: number;
+}
+
+export interface BulkPersonnelInput {
+  personnel: CreatePersonnelInput[];
 }
 
 // =============================================================================
@@ -50,8 +55,8 @@ export const personnelService = {
       .selectAll()
       .where('company_gstin', '=', gstin);
 
-    if (filters.is_active !== undefined) {
-      query = query.where('is_active', '=', filters.is_active);
+    if (!filters.include_deleted) {
+      query = query.where('is_active', '=', true);
     }
 
     query = query.orderBy('created_at', 'desc');
@@ -156,7 +161,6 @@ export const personnelService = {
         email: input.email ?? null,
         phone: input.phone ?? null,
         detailed_bio: input.detailed_bio ?? null,
-        is_active: true,
       })
       .returningAll()
       .executeTakeFirstOrThrow();
@@ -223,7 +227,59 @@ export const personnelService = {
   },
 
   /**
-   * Soft-delete personnel (is_active = false)
+   * Bulk create personnel records
+   * @witness [ID-001]
+   */
+  async bulkCreatePersonnel(profileId: string, inputs: CreatePersonnelInput[]) {
+    if (!inputs || inputs.length === 0) {
+      throw new Error('VALIDATION_FAILED');
+    }
+
+    if (inputs.length > 50) {
+      throw new Error('VALIDATION_FAILED');
+    }
+
+    const profile = await db
+      .selectFrom('profiles')
+      .select(['id', 'gstin', 'verification_status'])
+      .where('id', '=', profileId)
+      .executeTakeFirst();
+
+    if (!profile) {
+      throw new Error('RESOURCE_NOT_FOUND');
+    }
+
+    if (!profile.gstin || profile.verification_status !== 'VERIFIED') {
+      throw new Error('VALIDATION_FAILED');
+    }
+
+    const values = inputs.map((input) => ({
+      profile_id: profileId,
+      company_gstin: profile.gstin,
+      full_name: input.full_name,
+      designation: input.designation,
+      qualification: input.qualification ?? null,
+      specialty: input.specialty ?? [],
+      experience_years: input.experience_years ?? null,
+      email: input.email ?? null,
+      phone: input.phone ?? null,
+      detailed_bio: input.detailed_bio ?? null,
+    }));
+
+    const results = await db
+      .insertInto('company_personnel')
+      .values(values)
+      .returningAll()
+      .execute();
+
+    return {
+      created: results.length,
+      items: results,
+    };
+  },
+
+  /**
+   * Soft-delete personnel (sets is_active to false)
    * @witness [ID-001]
    */
   async deletePersonnel(id: string, userId: string) {

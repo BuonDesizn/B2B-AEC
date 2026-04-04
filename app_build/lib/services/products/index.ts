@@ -1,7 +1,6 @@
-import { db } from '@/lib/db';
-import { PERSONA_TYPES, SUBSCRIPTION_STATUS, ERROR_CODES } from '@/lib/constants';
-
 // @witness [PS-001]
+import { PERSONA_TYPES, SUBSCRIPTION_STATUS, ERROR_CODES } from '@/lib/constants';
+import { db } from '@/lib/db';
 
 // =============================================================================
 // Products Service

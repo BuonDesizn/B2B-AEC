@@ -1,12 +1,25 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
+
+interface Equipment {
+  id: string;
+  name: string;
+  category?: string;
+  location?: string;
+  available: boolean;
+  hourly_rate?: number;
+  daily_rate?: number;
+  monthly_rate?: number;
+}
 
 export default function MyEquipmentPage() {
-  const [equipment, setEquipment] = useState<any[]>([]);
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { notificationService, type NotificationType } from '@/lib/services/notifications';
 
 function createMockQueryBuilder(returnValue: any) {

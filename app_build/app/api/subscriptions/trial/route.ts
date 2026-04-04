@@ -1,5 +1,6 @@
 // @witness [MON-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { subscriptionService } from '@/lib/services/subscription';
 

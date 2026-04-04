@@ -1,10 +1,11 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 const CATEGORIES = [
   'Building Materials', 'Electrical', 'Plumbing', 'Finishes', 'Structural',
@@ -19,7 +20,6 @@ export default function AddEditProductPage() {
   const productId = searchParams.get('id');
   const isEditing = !!productId;
 
-  const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(isEditing);
   const [saving, setSaving] = useState(false);
 

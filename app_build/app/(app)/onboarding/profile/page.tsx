@@ -1,15 +1,16 @@
 // @witness [ID-001]
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { useMemo, useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { createClient } from '@/lib/supabase/client';
 
 export default function ProfileSetupPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [form, setForm] = useState({
@@ -25,11 +26,20 @@ export default function ProfileSetupPage() {
   useEffect(() => {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { router.push('/auth/login'); return; }
-      const { data: profile } = await supabase.from('profiles').select('email').eq('id', user.id).single();
-      if (profile?.email) setForm(prev => ({ ...prev, email: profile.email }));
+      if (!user) {
+        router.push('/auth/login');
+        return;
+      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('id', user.id)
+        .single();
+      if (profile?.email) {
+        setForm(prev => ({ ...prev, email: profile.email }));
+      }
     })();
-  }, []);
+  }, [supabase, router]);
 
   const update = (field: string, value: string) => setForm(prev => ({ ...prev, [field]: value }));
 

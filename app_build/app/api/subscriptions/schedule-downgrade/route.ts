@@ -1,8 +1,9 @@
 // @witness [MON-001]
+import { sql } from 'kysely';
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { sql } from 'kysely';
 
 export async function POST(request: Request) {
   try {

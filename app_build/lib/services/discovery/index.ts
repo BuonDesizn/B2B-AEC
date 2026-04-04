@@ -1,6 +1,8 @@
-import { db } from '@/lib/db';
+// @witness [RM-001]
 import { sql } from 'kysely';
+
 import { DQS_WEIGHTS, DQS_FORMULA_WEIGHTS, SUBSCRIPTION_STATUS, DEFAULT_PAGE_SIZE, MAX_PAGE_SIZE } from '@/lib/constants';
+import { db } from '@/lib/db';
 
 // =============================================================================
 // Discovery Ranking Constants
@@ -277,6 +279,8 @@ export const discoveryService = {
     const profiles = await db
       .selectFrom('profiles')
       .select('id')
+      .where('deleted_at', 'is', null)
+      .where('subscription_status', '!=', 'hard_locked')
       .execute();
 
     for (const profile of profiles) {

@@ -2,10 +2,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+
 import { Input } from '@/components/ui/input';
 
+interface Company {
+  org_name: string;
+  gstin: string;
+  personnel_count?: number;
+  verification_status?: string;
+}
+
 export default function CompaniesPage() {
-  const [companies, setCompanies] = useState<any[]>([]);
+  const [companies, setCompanies] = useState<Company[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
 

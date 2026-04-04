@@ -1,5 +1,6 @@
 // @witness [AD-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { adsService } from '@/lib/services/ads';
 

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { equipmentService } from '@/lib/services/equipment';
 
 function createMockQueryBuilder(returnValue: any) {
@@ -48,19 +49,19 @@ vi.mock('@/lib/db', () => {
 
   const mockProfile = {
     id: 'test-user',
-    role: 'ED',
+    persona_type: 'ED',
     subscription_status: 'active',
   };
 
   const mockNonEdProfile = {
     id: 'test-user',
-    role: 'CON',
+    persona_type: 'CON',
     subscription_status: 'active',
   };
 
   const mockHardLockedProfile = {
     id: 'test-user',
-    role: 'ED',
+    persona_type: 'ED',
     subscription_status: 'hard_locked',
   };
 
@@ -71,10 +72,10 @@ vi.mock('@/lib/db', () => {
 
   const chain = createMockQueryBuilder(mockEquipment);
   const profileChain = createMockQueryBuilder(mockProfile);
-  const nonEdProfileChain = createMockQueryBuilder(mockNonEdProfile);
-  const hardLockedChain = createMockQueryBuilder(mockHardLockedProfile);
-  const emptyChain = createMockQueryBuilder(undefined);
-  const unavailableChain = createMockQueryBuilder(mockUnavailableEquipment);
+  const _nonEdProfileChain = createMockQueryBuilder(mockNonEdProfile);
+  const _hardLockedChain = createMockQueryBuilder(mockHardLockedProfile);
+  const _emptyChain = createMockQueryBuilder(undefined);
+  const _unavailableChain = createMockQueryBuilder(mockUnavailableEquipment);
 
   return {
     db: {
@@ -148,7 +149,7 @@ describe('Equipment Service', () => {
 
     it('throws EQUIPMENT_CREATE_SUBSCRIPTION_LOCKED for hard_locked user', async () => {
       const { db } = await import('@/lib/db');
-      (db.selectFrom as any).mockReturnValue(createMockQueryBuilder({ role: 'ED', subscription_status: 'hard_locked' }));
+      (db.selectFrom as any).mockReturnValue(createMockQueryBuilder({ persona_type: 'ED', subscription_status: 'hard_locked' }));
 
       const input = {
         name: 'Test Equipment',
@@ -174,10 +175,11 @@ describe('Equipment Service', () => {
 
     it('serializes location object to JSON string', async () => {
       const { db } = await import('@/lib/db');
-      (db.selectFrom as any).mockReturnValue(createMockQueryBuilder({ role: 'ED', subscription_status: 'active' }));
+      (db.selectFrom as any).mockReturnValue(createMockQueryBuilder({ persona_type: 'ED', subscription_status: 'active' }));
 
       const input = {
         name: 'Test Equipment',
+        category: 'heavy',
         location: { lat: 19.076, lng: 72.877 },
       };
 

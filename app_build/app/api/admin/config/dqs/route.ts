@@ -1,13 +1,12 @@
 // @witness [RM-001]
 import { NextResponse } from 'next/server';
-import { requireAuth, AuthError } from '@/lib/auth';
+
+import { requireAdmin, AuthError } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export async function GET(request: Request) {
   try {
-    const user = await requireAuth(request);
-    const adminProfile = await db.selectFrom('profiles').select('role').where('id', '=', user.id).executeTakeFirst();
-    if (adminProfile?.role !== 'admin') return NextResponse.json({ success: false, error: { code: 'FORBIDDEN', message: 'Admin access required' } }, { status: 403 });
+    const _user = await requireAdmin(request);
 
     const config = await db.selectFrom('system_config').select('value').where('key', '=', 'dqs_config').executeTakeFirst();
     return NextResponse.json({ success: true, data: config ? config.value : { quality_weight: 0.7, distance_weight: 0.3 } });
@@ -19,9 +18,7 @@ export async function GET(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const user = await requireAuth(request);
-    const adminProfile = await db.selectFrom('profiles').select('role').where('id', '=', user.id).executeTakeFirst();
-    if (adminProfile?.role !== 'admin') return NextResponse.json({ success: false, error: { code: 'FORBIDDEN', message: 'Admin access required' } }, { status: 403 });
+    const _user = await requireAdmin(request);
 
     const body = await request.json();
     const result = await db

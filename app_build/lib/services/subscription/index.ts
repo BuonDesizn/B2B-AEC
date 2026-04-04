@@ -1,5 +1,6 @@
-import { db } from '@/lib/db';
+// @witness [MON-001]
 import { SUBSCRIPTION_STATUS, MONTHLY_CREDITS, TRIAL_DURATION_HOURS, TRIAL_LOCK_THRESHOLD_HOURS } from '@/lib/constants';
+import { db } from '@/lib/db';
 
 // =============================================================================
 // Subscription State Machine
@@ -10,7 +11,7 @@ export type SubscriptionState = 'trial' | 'active' | 'expired' | 'hard_locked';
 const SUBSCRIPTION_TRANSITIONS: Record<SubscriptionState, SubscriptionState[]> = {
   trial: ['active', 'hard_locked'],
   active: ['expired'],
-  expired: ['active'],
+  expired: ['active', 'hard_locked'],
   hard_locked: ['active'],
 };
 
@@ -83,10 +84,10 @@ export const subscriptionService = {
       throw new Error('Profile not found');
     }
 
-    const currentState = (profile.subscription_status ?? 'TRIAL') as SubscriptionState;
+    const currentState = (profile.subscription_status ?? SUBSCRIPTION_STATUS.TRIAL) as SubscriptionState;
 
     if (!canTransitionSubscription(currentState, SUBSCRIPTION_STATUS.ACTIVE)) {
-      throw new Error(`Cannot transition from ${currentState} to active`);
+      throw new Error(`Cannot transition from ${currentState} to ${SUBSCRIPTION_STATUS.ACTIVE}`);
     }
 
     const now = new Date();
@@ -286,8 +287,8 @@ export const subscriptionService = {
     const expiredTrials = await db
       .selectFrom('subscriptions')
       .select('profile_id')
-      .where('status', '=', 'TRIAL')
-      .where('trial_ends_at', '<', lockThreshold)
+      .where('status', '=', SUBSCRIPTION_STATUS.TRIAL)
+      .where('expires_at', '<', lockThreshold)
       .execute();
 
     for (const trial of expiredTrials) {
@@ -320,7 +321,7 @@ export const subscriptionService = {
       .where((eb) =>
         eb.or([
           eb('last_credit_reset_at', 'is', null),
-          eb('last_credit_reset_at', '<', now),
+          eb('last_credit_reset_at', '<', new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)),
         ])
       )
       .execute();
@@ -340,8 +341,8 @@ export const subscriptionService = {
       .executeTakeFirst();
 
     if (!profile) throw new Error('Profile not found');
-    if (profile.subscription_status === 'ACTIVE') {
-      throw new Error('Subscription already active');
+    if (profile.subscription_status === SUBSCRIPTION_STATUS.ACTIVE) {
+      throw new Error(`Subscription already ${SUBSCRIPTION_STATUS.ACTIVE}`);
     }
 
     // Generate transaction ID

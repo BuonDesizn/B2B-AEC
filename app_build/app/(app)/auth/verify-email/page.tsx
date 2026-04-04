@@ -1,10 +1,11 @@
 // @witness [ID-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
+import { createClient } from '@/lib/supabase/client';
 
 export default function VerifyEmailPage() {
   const router = useRouter();

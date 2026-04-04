@@ -2,24 +2,54 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
+import { createClient } from '@/lib/supabase/client';
+
+interface FirmProfile {
+  org_name: string;
+  gstin: string;
+  verification_status: string;
+  logo_url: string | null;
+}
+
+interface Personnel {
+  id: string;
+  company_gstin: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  designation: string | null;
+  specialty: string[] | null;
+  is_active: boolean;
+  created_at: string;
+}
 
 export default function FirmProfilePage() {
-  const [firm, setFirm] = useState<any>(null);
-  const [personnel, setPersonnel] = useState<any[]>([]);
+  const [firm, setFirm] = useState<FirmProfile | null>(null);
+  const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [loading, setLoading] = useState(true);
-  const supabase = createClient();
 
   useEffect(() => {
+    const supabase = createClient();
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data: profile } = await supabase.from('profiles').select('org_name, gstin, verification_status, logo_url').eq('id', user.id).single();
-      if (profile) setFirm(profile);
-      const { data: team } = await supabase.from('company_personnel').select('*').eq('company_gstin', profile?.gstin).limit(50);
-      if (team) setPersonnel(team);
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('org_name, gstin, verification_status, logo_url')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) {
+        setFirm(profile as FirmProfile);
+        const { data: team } = await supabase
+          .from('company_personnel')
+          .select('*')
+          .eq('company_gstin', profile.gstin)
+          .limit(50);
+        if (team) setPersonnel(team as Personnel[]);
+      }
       setLoading(false);
     })();
   }, []);
@@ -61,7 +91,9 @@ export default function FirmProfilePage() {
               <div key={p.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                 <div>
                   <p className="font-medium text-sm">{p.full_name}</p>
-                  <p className="text-xs text-muted-foreground">{p.designation || 'No designation'} · {p.specialty || 'No specialty'}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {p.designation || 'No designation'} · {p.specialty?.join(', ') || 'No specialty'}
+                  </p>
                 </div>
                 <Badge variant={p.is_active ? 'default' : 'secondary'}>{p.is_active ? 'Active' : 'Inactive'}</Badge>
               </div>
@@ -69,6 +101,7 @@ export default function FirmProfilePage() {
           </div>
         )}
       </div>
+
     </div>
   );
 }

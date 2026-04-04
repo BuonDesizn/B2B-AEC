@@ -1,6 +1,7 @@
 // @witness [ID-001]
 import { NextResponse } from 'next/server';
-import { requireAuth, AuthError, getOptionalAuth } from '@/lib/auth';
+
+import { requireAuth, AuthError } from '@/lib/auth';
 import { profileService } from '@/lib/services/profiles';
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {

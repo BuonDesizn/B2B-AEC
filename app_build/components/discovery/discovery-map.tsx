@@ -1,8 +1,8 @@
 'use client';
 
+import L from 'leaflet';
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
-import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix Leaflet default marker icons in Next.js
@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 });
 
-interface SearchResult {
+export interface SearchResult {
   profile_id: string;
   display_name: string;
   persona_type: string;

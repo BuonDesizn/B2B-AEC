@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+
 import {
   productSellerValidator,
   contractorValidator,
@@ -10,7 +11,8 @@ describe('Role Extension Validators', () => {
     it('validates correct input', () => {
       const errors = productSellerValidator.validate({
         profile_id: 'test-user',
-        business_type: 'MANUFACTURER',
+        primary_category: 'test',
+        business_type: 'Manufacturer',
         delivery_radius_km: 50,
         credit_period_days: 30,
       });
@@ -21,18 +23,20 @@ describe('Role Extension Validators', () => {
     it('rejects invalid business_type', () => {
       const errors = productSellerValidator.validate({
         profile_id: 'test-user',
+        primary_category: 'test',
         business_type: 'INVALID',
         delivery_radius_km: 50,
         credit_period_days: 30,
       });
 
-      expect(errors).toContain('business_type must be one of: MANUFACTURER, DISTRIBUTOR, RETAILER, WHOLESALER');
+      expect(errors).toContain('business_type must be one of: Manufacturer, Wholesaler, Retailer, Distributor');
     });
 
     it('rejects negative delivery_radius_km', () => {
       const errors = productSellerValidator.validate({
         profile_id: 'test-user',
-        business_type: 'MANUFACTURER',
+        primary_category: 'test',
+        business_type: 'Manufacturer',
         delivery_radius_km: -10,
         credit_period_days: 30,
       });
@@ -43,7 +47,8 @@ describe('Role Extension Validators', () => {
     it('rejects negative credit_period_days', () => {
       const errors = productSellerValidator.validate({
         profile_id: 'test-user',
-        business_type: 'MANUFACTURER',
+        primary_category: 'test',
+        business_type: 'Manufacturer',
         delivery_radius_km: 50,
         credit_period_days: -5,
       });
@@ -54,7 +59,8 @@ describe('Role Extension Validators', () => {
     it('allows zero values', () => {
       const errors = productSellerValidator.validate({
         profile_id: 'test-user',
-        business_type: 'MANUFACTURER',
+        primary_category: 'test',
+        business_type: 'Manufacturer',
         delivery_radius_km: 0,
         credit_period_days: 0,
       });
@@ -67,8 +73,9 @@ describe('Role Extension Validators', () => {
     it('validates correct input', () => {
       const errors = contractorValidator.validate({
         profile_id: 'test-user',
+        work_categories: ['test'],
         workforce_count: 50,
-        license_class: 'CLASS_A',
+        license_class: 'Class I',
         concurrent_projects_capacity: 3,
       });
 
@@ -78,8 +85,9 @@ describe('Role Extension Validators', () => {
     it('rejects negative workforce_count', () => {
       const errors = contractorValidator.validate({
         profile_id: 'test-user',
+        work_categories: ['test'],
         workforce_count: -5,
-        license_class: 'CLASS_A',
+        license_class: 'Class I',
         concurrent_projects_capacity: 3,
       });
 
@@ -89,19 +97,21 @@ describe('Role Extension Validators', () => {
     it('rejects invalid license_class', () => {
       const errors = contractorValidator.validate({
         profile_id: 'test-user',
+        work_categories: ['test'],
         workforce_count: 50,
         license_class: 'INVALID',
         concurrent_projects_capacity: 3,
       });
 
-      expect(errors).toContain('license_class must be one of: CLASS_A, CLASS_B, CLASS_C, CLASS_D, SPECIAL');
+      expect(errors).toContain('license_class must be one of: Class I, Class II, Class III, Unlimited');
     });
 
     it('rejects concurrent_projects_capacity less than 1', () => {
       const errors = contractorValidator.validate({
         profile_id: 'test-user',
+        work_categories: ['test'],
         workforce_count: 50,
-        license_class: 'CLASS_A',
+        license_class: 'Class I',
         concurrent_projects_capacity: 0,
       });
 
@@ -111,8 +121,9 @@ describe('Role Extension Validators', () => {
     it('rejects negative fleet_size', () => {
       const errors = contractorValidator.validate({
         profile_id: 'test-user',
+        work_categories: ['test'],
         workforce_count: 50,
-        license_class: 'CLASS_A',
+        license_class: 'Class I',
         concurrent_projects_capacity: 3,
         fleet_size: -2,
       });
@@ -125,6 +136,8 @@ describe('Role Extension Validators', () => {
     it('validates correct input', () => {
       const errors = equipmentDealerValidator.validate({
         profile_id: 'test-user',
+        business_type: 'RENTAL',
+        equipment_categories: ['test'],
         total_equipment_count: 25,
         park_location: { lat: 19.076, lng: 72.8777 },
       });
@@ -135,6 +148,8 @@ describe('Role Extension Validators', () => {
     it('rejects negative total_equipment_count', () => {
       const errors = equipmentDealerValidator.validate({
         profile_id: 'test-user',
+        business_type: 'RENTAL',
+        equipment_categories: ['test'],
         total_equipment_count: -5,
       });
 
@@ -144,6 +159,8 @@ describe('Role Extension Validators', () => {
     it('rejects invalid latitude', () => {
       const errors = equipmentDealerValidator.validate({
         profile_id: 'test-user',
+        business_type: 'RENTAL',
+        equipment_categories: ['test'],
         total_equipment_count: 25,
         park_location: { lat: 91, lng: 72.8777 },
       });
@@ -154,6 +171,8 @@ describe('Role Extension Validators', () => {
     it('rejects invalid longitude', () => {
       const errors = equipmentDealerValidator.validate({
         profile_id: 'test-user',
+        business_type: 'RENTAL',
+        equipment_categories: ['test'],
         total_equipment_count: 25,
         park_location: { lat: 19.076, lng: 181 },
       });
@@ -164,6 +183,8 @@ describe('Role Extension Validators', () => {
     it('allows zero equipment count', () => {
       const errors = equipmentDealerValidator.validate({
         profile_id: 'test-user',
+        business_type: 'RENTAL',
+        equipment_categories: ['test'],
         total_equipment_count: 0,
       });
 
@@ -173,6 +194,8 @@ describe('Role Extension Validators', () => {
     it('allows missing park_location', () => {
       const errors = equipmentDealerValidator.validate({
         profile_id: 'test-user',
+        business_type: 'RENTAL',
+        equipment_categories: ['test'],
         total_equipment_count: 25,
       });
 

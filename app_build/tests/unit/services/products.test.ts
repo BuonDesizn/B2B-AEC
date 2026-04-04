@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import { productsService } from '@/lib/services/products';
 
 function createMockQueryBuilder(returnValue: any) {
@@ -49,33 +50,12 @@ vi.mock('@/lib/db', () => {
 
   const mockProfile = {
     id: 'test-user',
-    role: 'PS',
+    persona_type: 'PS',
     subscription_status: 'active',
-  };
-
-  const mockNonPsProfile = {
-    id: 'test-user',
-    role: 'CON',
-    subscription_status: 'active',
-  };
-
-  const mockHardLockedProfile = {
-    id: 'test-user',
-    role: 'PS',
-    subscription_status: 'hard_locked',
-  };
-
-  const mockUnavailableProduct = {
-    ...mockProduct,
-    available: false,
   };
 
   const chain = createMockQueryBuilder(mockProduct);
   const profileChain = createMockQueryBuilder(mockProfile);
-  const nonPsProfileChain = createMockQueryBuilder(mockNonPsProfile);
-  const hardLockedChain = createMockQueryBuilder(mockHardLockedProfile);
-  const emptyChain = createMockQueryBuilder(undefined);
-  const unavailableChain = createMockQueryBuilder(mockUnavailableProduct);
 
   return {
     db: {
@@ -138,7 +118,7 @@ describe('Products Service', () => {
 
     it('throws PRODUCT_CREATE_NOT_PS for non-PS user', async () => {
       const { db } = await import('@/lib/db');
-      (db.selectFrom as any).mockReturnValue(createMockQueryBuilder({ role: 'CON', subscription_status: 'active' }));
+      (db.selectFrom as any).mockReturnValue(createMockQueryBuilder({ persona_type: 'CON', subscription_status: 'active' }));
 
       const input = {
         name: 'Test Product',
@@ -153,7 +133,7 @@ describe('Products Service', () => {
 
     it('throws PRODUCT_CREATE_SUBSCRIPTION_LOCKED for hard_locked user', async () => {
       const { db } = await import('@/lib/db');
-      (db.selectFrom as any).mockReturnValue(createMockQueryBuilder({ role: 'PS', subscription_status: 'hard_locked' }));
+      (db.selectFrom as any).mockReturnValue(createMockQueryBuilder({ persona_type: 'PS', subscription_status: 'hard_locked' }));
 
       const input = {
         name: 'Test Product',

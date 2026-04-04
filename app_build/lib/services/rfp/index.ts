@@ -1,10 +1,9 @@
+// @witness [RFP-001]
+import { RFP_STATUS, RFP_RESPONSE_STATUS, ERROR_CODES, CONNECTION_STATUS, PERSONA_TYPES } from '@/lib/constants';
 import { db } from '@/lib/db';
-import { sql } from 'kysely';
-import type { DB } from '@/lib/db/types';
-import { RFP_STATUS, RFP_RESPONSE_STATUS, ERROR_CODES, CONNECTION_STATUS } from '@/lib/constants';
+import type { DB as _DB } from '@/lib/db/types';
 
-type Rfp = DB['rfps'];
-type RfpResponse = DB['rfp_responses'];
+
 
 // =============================================================================
 // RFP State Machine
@@ -84,6 +83,16 @@ export const rfpService = {
    * @witness [RFP-001]
    */
   async create(input: CreateRfpInput) {
+    const creator = await db
+      .selectFrom('profiles')
+      .select('persona_type')
+      .where('id', '=', input.requester_id)
+      .executeTakeFirst();
+
+    if (creator?.persona_type === PERSONA_TYPES.PS || creator?.persona_type === PERSONA_TYPES.ED) {
+      throw new Error(ERROR_CODES.RFQ_CREATE_PERSONA_UNAUTHORIZED);
+    }
+
     if (input.title && (input.title.length < 10 || input.title.length > 100)) {
       throw new Error(ERROR_CODES.RFP_TITLE_LENGTH_INVALID);
     }

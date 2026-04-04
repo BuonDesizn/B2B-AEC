@@ -1,17 +1,12 @@
-// @witness [MON-001]
+import crypto from 'crypto';
+
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
 import { paymentService } from '@/lib/services/payments';
 
-const mockSelectFrom = vi.fn();
-const mockUpdateTable = vi.fn();
-const mockInsertInto = vi.fn();
 const mockTransaction = vi.fn();
-const mockWhere = vi.fn();
-const mockSelect = vi.fn();
 const mockExecuteTakeFirst = vi.fn();
 const mockExecute = vi.fn();
-const mockSet = vi.fn();
-const mockReturnAll = vi.fn();
 
 vi.mock('@/lib/db', () => ({
   db: {
@@ -77,21 +72,21 @@ describe('paymentService', () => {
     });
 
     it('should throw error if subscription already active', async () => {
-      mockExecuteTakeFirst.mockResolvedValue({ subscription_status: 'ACTIVE' });
+      mockExecuteTakeFirst.mockResolvedValue({ subscription_status: 'active' });
 
       await expect(paymentService.initPayment('user123', 'national_pro'))
         .rejects.toThrow('Subscription already active');
     });
 
     it('should throw error for unknown plan', async () => {
-      mockExecuteTakeFirst.mockResolvedValue({ subscription_status: 'TRIAL' });
+      mockExecuteTakeFirst.mockResolvedValue({ subscription_status: 'trial' });
 
       await expect(paymentService.initPayment('user123', 'unknown_plan'))
         .rejects.toThrow('Unknown plan: unknown_plan');
     });
 
     it('should return payment initialization result', async () => {
-      mockExecuteTakeFirst.mockResolvedValue({ subscription_status: 'TRIAL' });
+      mockExecuteTakeFirst.mockResolvedValue({ subscription_status: 'trial' });
 
       (global.fetch as any).mockResolvedValue({
         ok: true,
@@ -118,16 +113,15 @@ describe('paymentService', () => {
 
   describe('verifyPhonePeSignature', () => {
     it('should return true for valid signature', () => {
-      const payload = '{"state":"COMPLETED"}';
+      const originalPayload = '{"state":"COMPLETED"}';
       const salt = 'test_salt';
-      const crypto = require('crypto');
-      const base64Payload = Buffer.from(payload).toString('base64');
+      const base64Payload = Buffer.from(originalPayload).toString('base64');
       const validSignature = crypto
         .createHash('sha256')
         .update(base64Payload + salt)
         .digest('hex');
 
-      const result = paymentService.verifyPhonePeSignature(payload, validSignature, salt);
+      const result = paymentService.verifyPhonePeSignature(originalPayload, validSignature, salt);
 
       expect(result).toBe(true);
     });
@@ -160,7 +154,6 @@ describe('paymentService', () => {
         state: 'COMPLETED',
       };
 
-      const crypto = require('crypto');
       const payload = JSON.stringify(webhookBody);
       const base64Payload = Buffer.from(payload).toString('base64');
       const validSignature = crypto
@@ -190,7 +183,6 @@ describe('paymentService', () => {
         transactionId: 'T260402100000',
       };
 
-      const crypto = require('crypto');
       const payload = JSON.stringify(webhookBody);
       const base64Payload = Buffer.from(payload).toString('base64');
       const validSignature = crypto
@@ -225,7 +217,6 @@ describe('paymentService', () => {
         responseCode: 'FAILURE',
       };
 
-      const crypto = require('crypto');
       const payload = JSON.stringify(webhookBody);
       const base64Payload = Buffer.from(payload).toString('base64');
       const validSignature = crypto
@@ -259,7 +250,6 @@ describe('paymentService', () => {
         state: 'PENDING',
       };
 
-      const crypto = require('crypto');
       const payload = JSON.stringify(webhookBody);
       const base64Payload = Buffer.from(payload).toString('base64');
       const validSignature = crypto

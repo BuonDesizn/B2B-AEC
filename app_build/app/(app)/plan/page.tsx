@@ -1,7 +1,9 @@
+// @witness [UI-001]
 'use client';
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export default function PlanPage() {
   const [credits, setCredits] = useState(0);

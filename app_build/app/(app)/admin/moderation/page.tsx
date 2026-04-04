@@ -2,11 +2,19 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+interface ModerationAd {
+  id: string;
+  title: string;
+  moderation_reason?: string;
+  moderation_status: string;
+}
 
 export default function ModerationQueuePage() {
-  const [queue, setQueue] = useState<any[]>([]);
+  const [queue, setQueue] = useState<ModerationAd[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 

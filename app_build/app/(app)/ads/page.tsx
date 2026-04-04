@@ -1,11 +1,11 @@
 // @witness [AD-001]
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Ad {
   id: string;
@@ -29,7 +29,6 @@ const statusColors: Record<string, string> = {
 };
 
 export default function MyAdsPage() {
-  const router = useRouter();
   const [ads, setAds] = useState<Ad[]>([]);
   const [loading, setLoading] = useState(true);
 

@@ -1,9 +1,11 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 const STATUS_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -12,8 +14,19 @@ const STATUS_OPTIONS = [
   { value: 'ACCEPTED', label: 'Accepted' },
 ];
 
+interface Enquiry {
+  id: string;
+  source_name?: string;
+  message?: string;
+  sender_name?: string;
+  profile_name?: string;
+  status: string;
+  connection_source: string;
+  created_at?: string;
+}
+
 export default function EnquiriesPage() {
-  const [enquiries, setEnquiries] = useState<any[]>([]);
+  const [enquiries, setEnquiries] = useState<Enquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');

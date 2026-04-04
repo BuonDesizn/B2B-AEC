@@ -1,16 +1,34 @@
 // @witness [AD-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+interface ModerationHistory {
+  action: string;
+  created_at: string;
+  reason?: string;
+}
+
+interface Ad {
+  title: string;
+  creator_name?: string;
+  created_at: string;
+  status: 'ACTIVE' | 'SUSPENDED' | 'PENDING' | 'EXPIRED';
+  description?: string;
+  budget?: number;
+  impressions?: number;
+  clicks?: number;
+  spend?: number;
+  moderation_history?: ModerationHistory[];
+}
 
 export default function AdminAdDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const router = useRouter();
   const [resolvedParams, setResolvedParams] = useState<{ id: string } | null>(null);
-  const [ad, setAd] = useState<any>(null);
+  const [ad, setAd] = useState<Ad | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,7 +44,14 @@ export default function AdminAdDetailPage({ params }: { params: Promise<{ id: st
   }, [resolvedParams]);
 
   if (loading) return <div className="h-48 bg-muted rounded animate-pulse" />;
-  if (!ad) return <div className="text-center py-12"><p>Ad not found</p><Link href="/admin/moderation"><Button className="mt-4">Back to Moderation</Button></Link></div>;
+  if (!ad) return (
+    <div className="text-center py-12">
+      <p>Ad not found</p>
+      <Link href="/admin/moderation">
+        <Button className="mt-4">Back to Moderation</Button>
+      </Link>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
@@ -52,7 +77,7 @@ export default function AdminAdDetailPage({ params }: { params: Promise<{ id: st
           <div>
             <h2 className="text-lg font-semibold mb-2">Moderation History</h2>
             <div className="space-y-2">
-              {ad.moderation_history.map((h: any, i: number) => (
+              {ad.moderation_history.map((h: ModerationHistory, i: number) => (
                 <div key={i} className="p-3 bg-muted rounded-md text-sm">
                   <p className="font-medium">{h.action} · {new Date(h.created_at).toLocaleString()}</p>
                   <p className="text-muted-foreground">{h.reason || 'No reason provided'}</p>

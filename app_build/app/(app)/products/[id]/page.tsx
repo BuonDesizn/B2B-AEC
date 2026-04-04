@@ -1,11 +1,12 @@
 // @witness [PS-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface Product {
   id: string;
@@ -16,7 +17,7 @@ interface Product {
   price_per_unit: number | null;
   unit: string | null;
   min_order_quantity: number | null;
-  specifications: Record<string, any> | null;
+  specifications: Record<string, unknown> | null;
   available: boolean | null;
   is_active: boolean | null;
   created_at: string;

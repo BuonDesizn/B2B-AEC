@@ -1,13 +1,22 @@
 // @witness [MOD-001]
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from 'react';
+
+interface AdminStats {
+  total_users: number;
+  trial_users: number;
+  hard_locked: number;
+  today_handshakes: number;
+  open_rfps: number;
+  active_ads: number;
+  pending_verifications: number;
+  flagged_ads: number;
+}
 
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

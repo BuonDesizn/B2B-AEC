@@ -1,5 +1,6 @@
+// @witness [HD-001]
+import { CONNECTION_STATUS, SUBSCRIPTION_STATUS } from '@/lib/constants';
 import { db } from '@/lib/db';
-import { CONNECTION_STATUS, SUBSCRIPTION_STATUS, ERROR_CODES } from '@/lib/constants';
 
 // =============================================================================
 // Connection State Machine

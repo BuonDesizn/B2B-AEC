@@ -1,5 +1,6 @@
 // @witness [ED-001]
 import { NextResponse } from 'next/server';
+
 import { requireAuth, AuthError } from '@/lib/auth';
 import { equipmentService } from '@/lib/services/equipment';
 

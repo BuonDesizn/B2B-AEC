@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
 import {
   canTransitionRfp,
   canTransitionResponse,
   rfpService,
 } from '@/lib/services/rfp';
 
-function createMockQueryBuilder(returnValue: any) {
-  const chain: any = {
+function createMockQueryBuilder(returnValue: unknown) {
+  const chain = {
     selectAll: vi.fn(() => chain),
     select: vi.fn(() => chain),
     where: vi.fn(() => chain),
@@ -20,7 +21,7 @@ function createMockQueryBuilder(returnValue: any) {
     executeTakeFirst: vi.fn().mockResolvedValue(returnValue),
     executeTakeFirstOrThrow: vi.fn().mockResolvedValue(returnValue),
     execute: vi.fn().mockResolvedValue(Array.isArray(returnValue) ? returnValue : [returnValue]),
-  };
+  } as any;
   return chain;
 }
 
@@ -155,8 +156,10 @@ describe('RFP Service', () => {
     it('creates RFP in DRAFT state', async () => {
       const input = {
         requester_id: 'test-user',
-        title: 'Test RFP',
+        title: 'Bulk Cement Requirement for Pune Project',
+        description: 'We are looking for a reliable supplier for 500 MT of OPC 53 Grade cement for our upcoming residential project in Pune. Delivery is required within 15 days.',
         category: 'construction',
+        location: 'New York',
         expiry_date: new Date('2026-05-01'),
       };
 

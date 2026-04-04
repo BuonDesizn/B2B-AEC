@@ -1,14 +1,13 @@
 // @witness [RFP-001]
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export default function RFPResponseDetailPage({ params }: { params: Promise<{ id: string; responseId: string }> }) {
-  const router = useRouter();
   const [resolvedParams, setResolvedParams] = useState<{ id: string; responseId: string } | null>(null);
   const [response, setResponse] = useState<any>(null);
   const [loading, setLoading] = useState(true);

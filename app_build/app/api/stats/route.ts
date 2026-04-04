@@ -1,6 +1,6 @@
 // @witness [UI-001]
-import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import { NextResponse } from 'next/server';
 
 export async function GET() {
   try {
@@ -24,7 +24,7 @@ export async function GET() {
       .select('persona_type')
       .not('persona_type', 'is', null);
 
-    const roleDistribution = (roleCounts || []).reduce((acc, row) => {
+    const roleDistribution = (roleCounts || []).reduce((acc: Record<string, number>, row: { persona_type: string }) => {
       const role = row.persona_type;
       acc[role] = (acc[role] || 0) + 1;
       return acc;

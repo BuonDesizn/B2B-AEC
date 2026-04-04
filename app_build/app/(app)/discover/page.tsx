@@ -1,10 +1,13 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+
+import { type SearchResult } from '@/components/discovery/discovery-map';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 
 const DiscoveryMap = dynamic(
   () => import('@/components/discovery/discovery-map').then(m => m.DiscoveryMap),
@@ -22,21 +25,21 @@ const ROLES = [
 
 const RADII = [10, 25, 50, 100];
 
-export default function DiscoverPage({ searchParams }: { searchParams: Promise<{ role?: string }> }) {
-  const router = useRouter();
-  const [results, setResults] = useState<any[]>([]);
+export default function DiscoverPage() {
+  const searchParams = useSearchParams();
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [keyword, setKeyword] = useState('');
-  const [role, setRole] = useState('');
+  const [keyword, setKeyword] = useState(searchParams.get('q') || '');
+  const [role, setRole] = useState(searchParams.get('role') || '');
   const [radius, setRadius] = useState(50);
   const [location, setLocation] = useState({ lat: 19.076, lng: 72.8777 });
   const [page, setPage] = useState(1);
 
   useEffect(() => {
-    (async () => {
-      const params = await searchParams;
-      if (params.role) setRole(params.role);
-    })();
+    const q = searchParams.get('q');
+    const r = searchParams.get('role');
+    if (q) setKeyword(q);
+    if (r) setRole(r);
   }, [searchParams]);
 
   const search = useCallback(async () => {
@@ -78,13 +81,13 @@ export default function DiscoverPage({ searchParams }: { searchParams: Promise<{
           <div className="w-[180px]">
             <label className="text-sm font-medium mb-1 block">Role</label>
             <select value={role} onChange={e => setRole(e.target.value)} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-              {ROLES.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
+              {ROLES.map((r: { value: string; label: string }) => <option key={r.value} value={r.value}>{r.label}</option>)}
             </select>
           </div>
           <div className="w-[120px]">
             <label className="text-sm font-medium mb-1 block">Radius (km)</label>
             <div className="flex gap-1">
-              {RADII.map(r => (
+              {RADII.map((r: number) => (
                 <Button key={r} variant={radius === r ? 'default' : 'outline'} size="sm" onClick={() => setRadius(r)} className="flex-1 px-1">{r}</Button>
               ))}
             </div>
@@ -124,7 +127,7 @@ export default function DiscoverPage({ searchParams }: { searchParams: Promise<{
                       <h3 className="font-semibold">{r.display_name}</h3>
                       <p className="text-sm text-muted-foreground">{r.city}, {r.state}</p>
                     </div>
-                    <span className="inline-flex items-center rounded-full border border-input px-2.5 py-0.5 text-xs font-semibold">{r.persona_type}</span>
+                    <Badge variant="outline">{r.persona_type}</Badge>
                   </div>
                   <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                     <span>DQS: {(r.dqs_score ?? 0).toFixed(2)}</span>

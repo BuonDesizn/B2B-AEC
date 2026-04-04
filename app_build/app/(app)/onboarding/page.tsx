@@ -1,11 +1,12 @@
 // @witness [ID-001]
 'use client';
 
-import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
+import { useMemo, useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { createClient } from '@/lib/supabase/client';
 
 const ROLES = [
   { value: 'PP', label: 'Project Professional', desc: 'Architect, Engineer, Designer' },
@@ -17,7 +18,7 @@ const ROLES = [
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState('PP');
   const [idType, setIdType] = useState<'individual' | 'company'>('individual');
@@ -28,9 +29,11 @@ export default function OnboardingPage() {
   useEffect(() => {
     (async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session) router.push('/auth/login');
+      if (!session) {
+        router.push('/auth/login');
+      }
     })();
-  }, []);
+  }, [supabase, router]);
 
   const handleSubmit = async () => {
     setLoading(true);

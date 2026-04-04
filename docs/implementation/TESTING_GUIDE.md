@@ -1,5 +1,17 @@
 # Integration & E2E Testing Guide
 
+## Local Environment Setup
+
+Copy `.env.example` to `.env.local` before running tests. Key flags for local/test environments:
+
+| Variable | Value | Purpose |
+|----------|-------|---------|
+| `PHONEPE_SKIP_SIGNATURE_VERIFY` | `true` | Bypasses PhonePe callback signature check — **must be `false` in production** |
+| `PHONEPE_ENVIRONMENT` | `UAT` | Points to PhonePe sandbox |
+| `QSTASH_CURRENT_SIGNING_KEY` | (from Upstash dashboard) | Required for `verifyQStashSignature()` to pass |
+
+---
+
 ## Overview
 
 This project uses a three-tier testing strategy:

@@ -2,11 +2,20 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+
+interface IdentityRequest {
+  id: string;
+  org_name?: string;
+  pan?: string;
+  gstin?: string;
+  persona_type: string;
+}
 
 export default function IdentityReviewPage() {
-  const [queue, setQueue] = useState<any[]>([]);
+  const [queue, setQueue] = useState<IdentityRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 

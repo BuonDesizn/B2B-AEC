@@ -1,9 +1,10 @@
+// @witness [UI-001]
 'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 interface BrowseRfp {
   id: string;
@@ -60,7 +61,6 @@ const formatINR = (val: number | null) => {
 };
 
 export default function BrowseRFPsPage() {
-  const router = useRouter();
   const [rfps, setRfps] = useState<BrowseRfp[]>([]);
   const [loading, setLoading] = useState(true);
   const [categoryFilter, setCategoryFilter] = useState('');

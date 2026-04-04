@@ -1,18 +1,14 @@
 // @witness [UI-001]
 'use client';
 
-import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 
 export default function AdminConfigPage() {
-  const [config, setConfig] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/admin/config', { credentials: 'include' })
-      .then(res => res.json())
-      .then(data => { if (data.success) setConfig(data.data); setLoading(false); })
-      .catch(() => setLoading(false));
+    setLoading(false);
   }, []);
 
   if (loading) return <div className="h-48 bg-muted rounded animate-pulse" />;
