@@ -393,9 +393,6 @@ BEGIN
 END;
 $$;
 
--- pg_cron job — schedule DQS recalc at 2 AM UTC daily
-SELECT cron.schedule('dqs-daily-recalc', '0 2 * * *', 'SELECT dqs_recalculate()');
-
 -- =============================================================================
 -- SECTION 8: Updated_at auto-trigger
 -- =============================================================================

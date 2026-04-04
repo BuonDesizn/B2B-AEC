@@ -51,10 +51,11 @@ export async function middleware(request: NextRequest) {
   const publicPaths = [
     '/',
     '/auth/callback',
-    '/auth/signin',
+    '/auth/login',
     '/auth/signup',
     '/auth/reset-password',
-    '/api/webhooks/',
+    '/api/payment/phonepe/callback',
+    '/api/jobs/',
   ];
 
   const path = request.nextUrl.pathname;
@@ -70,7 +71,7 @@ export async function middleware(request: NextRequest) {
 
   // Redirect to sign-in if not authenticated
   if (!session) {
-    const redirectUrl = new URL('/auth/signin', request.url);
+    const redirectUrl = new URL('/auth/login', request.url);
     redirectUrl.searchParams.set('callbackUrl', encodeURIComponent(path));
     return NextResponse.redirect(redirectUrl);
   }

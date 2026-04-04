@@ -3,8 +3,8 @@ title: Database Schema
 id: DB_SCHEMA
 type: technical_specification
 status: production_ready
-version: 2.0
-last_updated: 2026-04-02
+version: 4.0
+last_updated: 2026-04-03
 owner: @architect
 criticality: high
 [ARCHITECTURE]: ../core/ARCHITECTURE.md
@@ -30,12 +30,13 @@ marketplace. All tables are optimized for `PostgreSQL 15+` with `PostGIS` and
 5. [Advertising & Tiering](#advertising-tiering)
 6. [Monetization & Subs](#monetization-subs)
 7. [Catalogs (Products & Equipment)](#catalogs-products-equipment)
-8. [Company Personnel](#company-personnel)
-9. [Notification & Ops](#notification-ops)
-10. [Audit & Privacy](#audit-privacy)
-11. [Geospatial Functions](#geospatial-functions)
-12. [Spec Traceability Mapping](#spec-traceability-mapping)
-13. [System Configuration](#system-configuration)
+8. [Portfolio & Invoices](#portfolio-invoices)
+9. [Company Personnel](#company-personnel)
+10. [Notification & Ops](#notification-ops)
+11. [Audit & Privacy](#audit-privacy)
+12. [Geospatial Functions](#geospatial-functions)
+13. [Spec Traceability Mapping](#spec-traceability-mapping)
+14. [System Configuration](#system-configuration)
 
 ---
 
@@ -47,6 +48,7 @@ marketplace. All tables are optimized for `PostgreSQL 15+` with `PostGIS` and
 | `profiles` / `auth.users` | `ID-001` | Individual Identity (PAN) & Company DNA (GSTIN) linkage. |
 | `project_professionals` | `PP-001` | Professional credentials and portfolio management. |
 | `consultants` | `C-001` | Firm-level service scope and engineering compliance. |
+| `services` | `C-001` | Detailed consultant service listings with pricing and images. |
 | `contractors` | `CON-001` | Workforce, equipment fleet, and safety incident tracking. |
 | `product_sellers` | `PS-001` | Bulk inventory, delivery radius, and credit terms. |
 | `equipment_dealers` | `ED-001` | Heavy machinery rental, RC monitoring, and operator logistics. |
@@ -55,6 +57,8 @@ marketplace. All tables are optimized for `PostgreSQL 15+` with `PostGIS` and
 | `rfps` / `rfp_responses` | `RFP-001` | Quality-First (70/30) Discovery & Asynchronous RFP Broadcaster. |
 | `ads` / `ad_analytics` | `AD-001` | Geo-targeted hyper-local visibility for B2B. |
 | `subscriptions` | `MON-001` | National Pro Model (India-wide access control). |
+| `portfolio_items` | `PP-001` `CON-001` | Work samples and project showcases. |
+| `invoices` | `MON-001` | Billing history and payment audit trail. |
 | `unmasking_audit` | `HD-001` | Compliance & Privacy (Immutable witness logs). |
 | `system_config` | `RM-001` | Dynamic Ranking Weights & DQS parameters. |
 
@@ -120,6 +124,7 @@ CREATE TABLE profiles (
   trial_started_at TIMESTAMPTZ,
   handshake_credits INT NOT NULL DEFAULT 30,
   last_credit_reset_at TIMESTAMPTZ,
+  credits_reset_at TIMESTAMPTZ,  -- Alias for last_credit_reset_at (service compatibility)
   has_india_access BOOLEAN DEFAULT FALSE,
 
   -- DQS (Discovery Quality Score — updated by cron at 2 AM daily)
@@ -134,6 +139,15 @@ CREATE TABLE profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ,
   last_active_at TIMESTAMPTZ DEFAULT now(),
+
+  -- Profile display (service compatibility columns)
+  avatar_url TEXT,
+  phone_number TEXT,  -- Alias for phone_primary
+  address TEXT,       -- Alias for address_line1
+  postal_code TEXT,   -- Alias for pincode
+
+  -- Access control
+  role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('user', 'super_admin')),
 
   -- Integrity constraints
   CONSTRAINT unique_persona_per_individual UNIQUE (pan, persona_type)
@@ -182,11 +196,18 @@ CREATE TABLE project_professionals (
   hourly_rate_max DECIMAL(10,2),
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+  CONSTRAINT pp_rates_order CHECK (hourly_rate_min IS NULL OR hourly_rate_max IS NULL OR hourly_rate_min <= hourly_rate_max)
 );
 
 CREATE INDEX idx_pp_profile ON project_professionals(profile_id);
 CREATE INDEX idx_pp_designation ON project_professionals(designation);
+
+ALTER TABLE project_professionals ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "project_professionals_owner_select" ON project_professionals
+  FOR SELECT USING (auth.uid() = profile_id);
 
 CREATE TRIGGER project_professionals_updated_at
   BEFORE UPDATE ON project_professionals
@@ -203,7 +224,7 @@ CREATE TABLE consultants (
   annual_turnover_range TEXT CHECK (annual_turnover_range IN ('0-10L', '10L-50L', '50L-1Cr', '1Cr-5Cr', '5Cr-10Cr', '10Cr+')),
   employee_count_range TEXT CHECK (employee_count_range IN ('1-10', '11-50', '51-200', '201-500', '500+')),
 
-  services_offered TEXT[] NOT NULL,
+  services_offered TEXT[] NOT NULL CHECK (array_length(services_offered, 1) IS NOT NULL AND array_length(services_offered, 1) > 0),
   design_software TEXT[] DEFAULT ARRAY[]::TEXT[],
 
   iso_9001 BOOLEAN DEFAULT FALSE,
@@ -217,14 +238,65 @@ CREATE TABLE consultants (
   min_project_value DECIMAL(10,2),
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+  CONSTRAINT c_project_value_range CHECK (min_project_value IS NULL OR largest_project_value IS NULL OR min_project_value <= largest_project_value)
 );
 
 CREATE INDEX idx_c_profile ON consultants(profile_id);
 CREATE INDEX idx_c_company_type ON consultants(company_type);
 
+ALTER TABLE consultants ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "consultants_owner_select" ON consultants
+  FOR SELECT USING (auth.uid() = profile_id);
+
 CREATE TRIGGER consultants_updated_at
   BEFORE UPDATE ON consultants
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+```
+
+### 2.2a Services (C)
+*Detailed service offerings for Consultants. Each service has its own listing with pricing, images, and metadata.*
+
+```sql
+CREATE TABLE services (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+
+  title TEXT NOT NULL CHECK (char_length(title) BETWEEN 3 AND 100),
+  description TEXT CHECK (char_length(description) <= 1000),
+  category TEXT NOT NULL,
+  subcategory TEXT,
+
+  price_per_hour DECIMAL(10,2),
+  price_per_project DECIMAL(10,2),
+  delivery_time_days INT,
+  requires_site_visit BOOLEAN DEFAULT FALSE,
+
+  images TEXT[] DEFAULT ARRAY[]::TEXT[]
+    CHECK (array_length(images, 1) IS NULL OR array_length(images, 1) <= 5),
+
+  deleted_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_services_profile ON services(profile_id);
+CREATE INDEX idx_services_category ON services(category);
+CREATE INDEX idx_services_deleted_at ON services(deleted_at) WHERE deleted_at IS NOT NULL;
+
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "services_select_active" ON services
+  FOR SELECT TO authenticated
+  USING (deleted_at IS NULL OR auth.uid() = profile_id);
+
+CREATE POLICY "services_owner_all" ON services
+  FOR ALL USING (auth.uid() = profile_id);
+
+CREATE TRIGGER services_updated_at
+  BEFORE UPDATE ON services
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 ```
 
@@ -237,8 +309,8 @@ CREATE TABLE contractors (
   company_type TEXT CHECK (company_type IN ('Proprietorship', 'Partnership', 'Private Limited', 'LLP', 'Public Limited')),
   annual_turnover_range TEXT CHECK (annual_turnover_range IN ('0-1Cr', '1-5Cr', '5-10Cr', '10-25Cr', '25-50Cr', '50Cr+')),
 
-  permanent_employees INT DEFAULT 0,
-  skilled_workers INT DEFAULT 0,
+  permanent_employees INT DEFAULT 0 CHECK (permanent_employees >= 0),
+  skilled_workers INT DEFAULT 0 CHECK (skilled_workers >= 0),
   owned_equipment JSONB DEFAULT '[]'::jsonb,
 
   pf_registration_number TEXT,
@@ -251,8 +323,12 @@ CREATE TABLE contractors (
   license_class TEXT CHECK (license_class IN ('Class I', 'Class II', 'Class III', 'Unlimited')),
   license_expiry_date DATE,
 
-  concurrent_projects_capacity INT DEFAULT 1,
+  concurrent_projects_capacity INT DEFAULT 1 CHECK (concurrent_projects_capacity >= 1),
   largest_project_completed DECIMAL(15,2),
+
+  workforce_count INT,
+  specializations TEXT[] DEFAULT ARRAY[]::TEXT[],
+  fleet_size INT,
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -260,6 +336,11 @@ CREATE TABLE contractors (
 
 CREATE INDEX idx_con_profile ON contractors(profile_id);
 CREATE INDEX idx_con_license_class ON contractors(license_class);
+
+ALTER TABLE contractors ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "contractors_owner_select" ON contractors
+  FOR SELECT USING (auth.uid() = profile_id);
 
 CREATE TRIGGER contractors_updated_at
   BEFORE UPDATE ON contractors
@@ -280,16 +361,18 @@ CREATE TABLE product_sellers (
   min_order_value DECIMAL(10,2),
   accepts_bulk_orders BOOLEAN DEFAULT TRUE,
   delivery_available BOOLEAN DEFAULT TRUE,
-  delivery_radius_km INT DEFAULT 0,
+  delivery_radius_km INT DEFAULT 0 CHECK (delivery_radius_km >= 0),
 
   warehouse_locations JSONB DEFAULT '[]'::jsonb,
   total_skus INT DEFAULT 0,
   offers_credit BOOLEAN DEFAULT FALSE,
-  credit_period_days INT DEFAULT 0,
+  credit_period_days INT DEFAULT 0 CHECK (credit_period_days >= 0),
 
   iso_certified BOOLEAN DEFAULT FALSE,
   bis_certified BOOLEAN DEFAULT FALSE,
   warranty_offered BOOLEAN DEFAULT FALSE,
+
+  sku_capacity INT,
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -298,6 +381,11 @@ CREATE TABLE product_sellers (
 CREATE INDEX idx_ps_profile ON product_sellers(profile_id);
 CREATE INDEX idx_ps_business_type ON product_sellers(business_type);
 CREATE INDEX idx_ps_category ON product_sellers(primary_category);
+
+ALTER TABLE product_sellers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "product_sellers_owner_select" ON product_sellers
+  FOR SELECT USING (auth.uid() = profile_id);
 
 CREATE TRIGGER product_sellers_updated_at
   BEFORE UPDATE ON product_sellers
@@ -311,7 +399,7 @@ CREATE TABLE equipment_dealers (
   profile_id UUID UNIQUE NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
 
   business_type TEXT CHECK (business_type IN ('Rental', 'Sales', 'Both')) NOT NULL,
-  total_equipment_count INT DEFAULT 0,
+  total_equipment_count INT DEFAULT 0 CHECK (total_equipment_count >= 0),
   equipment_categories TEXT[] NOT NULL,
 
   park_location GEOGRAPHY(POINT, 4326),
@@ -325,6 +413,8 @@ CREATE TABLE equipment_dealers (
   breakdown_support_24x7 BOOLEAN DEFAULT FALSE,
   all_rc_updated BOOLEAN DEFAULT FALSE,
 
+  rental_categories TEXT[] DEFAULT ARRAY[]::TEXT[],
+
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -333,6 +423,11 @@ CREATE INDEX idx_ed_profile ON equipment_dealers(profile_id);
 CREATE INDEX idx_ed_business_type ON equipment_dealers(business_type);
 CREATE INDEX idx_ed_categories ON equipment_dealers USING GIN(equipment_categories);
 CREATE INDEX idx_ed_park_location ON equipment_dealers USING GIST(park_location) WHERE park_location IS NOT NULL;
+
+ALTER TABLE equipment_dealers ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "equipment_dealers_owner_select" ON equipment_dealers
+  FOR SELECT USING (auth.uid() = profile_id);
 
 CREATE TRIGGER equipment_dealers_updated_at
   BEFORE UPDATE ON equipment_dealers
@@ -363,9 +458,12 @@ CREATE TABLE connections (
   target_shares_phone BOOLEAN DEFAULT FALSE,
 
   -- Timestamps
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   initiated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   responded_at TIMESTAMPTZ,
-  expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '30 days')
+  expires_at TIMESTAMPTZ DEFAULT (now() + INTERVAL '30 days'),
+  updated_at TIMESTAMPTZ DEFAULT now(),
+  deleted_at TIMESTAMPTZ
 );
 
 -- Partial unique: only one active connection per pair at a time
@@ -381,6 +479,10 @@ CREATE INDEX idx_connections_parties_status ON connections (requester_id, target
 
 ALTER TABLE connections ENABLE ROW LEVEL SECURITY;
 
+CREATE TRIGGER connections_updated_at
+  BEFORE UPDATE ON connections
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
 CREATE POLICY "connections_parties_only" ON connections
   FOR ALL USING (auth.uid() IN (requester_id, target_id));
 ```
@@ -392,8 +494,9 @@ CREATE TABLE address_book (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   owner_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   contact_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
-  first_handshake_id UUID REFERENCES connections(id),
+  first_handshake_id UUID REFERENCES connections(id) ON DELETE CASCADE,
   added_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now(),
   UNIQUE (owner_id, contact_id)
 );
 
@@ -435,7 +538,7 @@ CREATE TRIGGER address_book_auto_populate
 
 ```sql
 CREATE TABLE company_personnel (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   company_gstin TEXT NOT NULL,
 
@@ -453,13 +556,14 @@ CREATE TABLE company_personnel (
   profile_image_url TEXT,
   linkedin_url TEXT,
 
-  is_active BOOLEAN NOT NULL DEFAULT true,
+  deleted_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE INDEX idx_personnel_gstin ON company_personnel (company_gstin);
 CREATE INDEX idx_personnel_profile ON company_personnel (profile_id);
+CREATE INDEX idx_personnel_deleted_at ON company_personnel(deleted_at);
 
 ALTER TABLE company_personnel ENABLE ROW LEVEL SECURITY;
 
@@ -530,19 +634,28 @@ CREATE TABLE subscriptions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   plan_name TEXT NOT NULL DEFAULT 'national_pro',
+  amount DECIMAL(10,2),
   status TEXT NOT NULL CHECK (status IN ('trial', 'active', 'expired', 'hard_locked')),
   activated_at TIMESTAMPTZ,
   expires_at TIMESTAMPTZ,
+  current_period_start TIMESTAMPTZ,
+  current_period_end TIMESTAMPTZ,
   phonepe_order_id TEXT,
   phonepe_transaction_id TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
 );
 
 CREATE INDEX idx_subscriptions_profile ON subscriptions(profile_id);
 CREATE INDEX idx_subscriptions_status ON subscriptions(status);
 CREATE INDEX idx_subscriptions_expires ON subscriptions(expires_at);
+CREATE INDEX idx_subscriptions_period ON subscriptions(current_period_start, current_period_end);
 
 ALTER TABLE subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE TRIGGER subscriptions_updated_at
+  BEFORE UPDATE ON subscriptions
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE POLICY "subscriptions_self" ON subscriptions
   FOR ALL USING (auth.uid() = profile_id);
@@ -588,12 +701,14 @@ CREATE POLICY "subscription_plans_select" ON subscription_plans
 CREATE TABLE rfps (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   creator_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  request_type TEXT CHECK (request_type IN ('PRODUCT', 'SERVICE', 'EQUIPMENT', 'PROJECT')) DEFAULT 'PROJECT',
 
   title TEXT NOT NULL CHECK (char_length(title) BETWEEN 10 AND 100),
   description TEXT NOT NULL CHECK (char_length(description) BETWEEN 50 AND 2000),
 
   sector_of_application TEXT NOT NULL,
   category TEXT NOT NULL,
+  subcategory TEXT,
 
   requirements JSONB NOT NULL,
   attachments TEXT[],
@@ -635,6 +750,7 @@ CREATE TABLE rfps (
 
 CREATE INDEX idx_rfps_creator ON rfps(creator_id);
 CREATE INDEX idx_rfps_status ON rfps(status);
+CREATE INDEX idx_rfps_subcategory ON rfps(subcategory);
 CREATE INDEX idx_rfps_location ON rfps USING GIST(project_location) WHERE status = 'OPEN';
 CREATE INDEX idx_rfps_category ON rfps(category);
 CREATE INDEX idx_rfps_expires ON rfps(expires_at) WHERE status = 'OPEN';
@@ -665,7 +781,7 @@ CREATE TABLE rfp_responses (
   responder_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
 
   proposal_text TEXT NOT NULL,
-  bid_amount DECIMAL(12,2),
+  estimated_cost DECIMAL(12,2),
   estimated_days INT,
   attachments_url TEXT[],
 
@@ -679,6 +795,7 @@ CREATE TABLE rfp_responses (
 CREATE INDEX idx_rfp_responses_rfp ON rfp_responses(rfp_id);
 CREATE INDEX idx_rfp_responses_responder ON rfp_responses(responder_id);
 CREATE INDEX idx_rfp_responses_status ON rfp_responses(status);
+CREATE INDEX idx_rfp_responses_proposal ON rfp_responses USING GIN(to_tsvector('english', COALESCE(proposal_text)));
 
 ALTER TABLE rfp_responses ENABLE ROW LEVEL SECURITY;
 
@@ -717,6 +834,7 @@ CREATE TABLE rfp_invitations (
   status TEXT CHECK (status IN ('PENDING', 'ACCEPTED', 'DECLINED')) DEFAULT 'PENDING',
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
   UNIQUE(rfp_id, invitee_id)
 );
 
@@ -767,8 +885,9 @@ CREATE TABLE ads (
   )) DEFAULT 'DRAFT',
 
   moderation_status TEXT CHECK (moderation_status IN (
-    'PENDING', 'APPROVED', 'REJECTED', 'FLAGGED'
+    'PENDING', 'APPROVED', 'REJECTED', 'FLAGGED', 'SUSPENDED', 'CLEARED'
   )) DEFAULT 'PENDING',
+  rejection_reason TEXT,
 
   placement_type TEXT CHECK (placement_type IN ('HOMEPAGE', 'DISCOVERY', 'PROFILE', 'RFP')) DEFAULT 'HOMEPAGE',
   target_audience_roles TEXT[] DEFAULT ARRAY['PP', 'C', 'CON', 'PS', 'ED']::TEXT[],
@@ -777,7 +896,15 @@ CREATE TABLE ads (
   priority_score INT DEFAULT 0,
 
   budget_inr DECIMAL(10,2),
+  budget_remaining DECIMAL(10,2),
   cost_per_click DECIMAL(8,2),
+
+  impressions INT DEFAULT 0,
+  clicks INT DEFAULT 0,
+  ctr NUMERIC(5,4) DEFAULT 0,
+  cpc NUMERIC(8,2) DEFAULT 0,
+
+  payment_status TEXT CHECK (payment_status IN ('PENDING', 'PAID', 'FAILED', 'REFUNDED')),
 
   expires_at TIMESTAMPTZ,
   is_paused BOOLEAN DEFAULT FALSE,
@@ -791,6 +918,8 @@ CREATE INDEX idx_ads_status ON ads(status);
 CREATE INDEX idx_ads_location ON ads USING GIST(location) WHERE status = 'ACTIVE' AND is_paused = FALSE;
 CREATE INDEX idx_ads_placement ON ads(placement_type);
 CREATE INDEX idx_ads_expires ON ads(expires_at) WHERE status = 'ACTIVE';
+CREATE INDEX idx_ads_payment_status ON ads(payment_status);
+CREATE INDEX idx_ads_rejection_reason ON ads(rejection_reason) WHERE rejection_reason IS NOT NULL;
 
 ALTER TABLE ads ENABLE ROW LEVEL SECURITY;
 
@@ -817,7 +946,7 @@ CREATE TABLE ad_analytics (
   ad_id UUID NOT NULL REFERENCES ads(id) ON DELETE CASCADE,
 
   event_type TEXT CHECK (event_type IN ('IMPRESSION', 'CLICK', 'CONNECT')) NOT NULL,
-  viewer_id UUID REFERENCES profiles(id),
+  viewer_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
 
   viewer_lat FLOAT,
   viewer_lng FLOAT,
@@ -828,6 +957,7 @@ CREATE TABLE ad_analytics (
 
 CREATE INDEX idx_ad_analytics_ad ON ad_analytics(ad_id);
 CREATE INDEX idx_ad_analytics_event ON ad_analytics(event_type);
+CREATE INDEX idx_ad_analytics_viewer ON ad_analytics(viewer_id);
 CREATE INDEX idx_ad_analytics_created ON ad_analytics(created_at);
 
 ALTER TABLE ad_analytics ENABLE ROW LEVEL SECURITY;
@@ -864,24 +994,29 @@ CREATE TABLE products (
   unit TEXT DEFAULT 'per piece',
   min_order_quantity INT DEFAULT 1,
 
-  images TEXT[] DEFAULT ARRAY[]::TEXT[],
+  images TEXT[] DEFAULT ARRAY[]::TEXT[]
+    CHECK (array_length(images, 1) IS NULL OR array_length(images, 1) <= 5),
+  specifications JSONB,
   available BOOLEAN DEFAULT TRUE,
-  is_active BOOLEAN DEFAULT TRUE,
-
+  deleted_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+  CONSTRAINT products_images_max_5
+    CHECK (array_length(images, 1) IS NULL OR array_length(images, 1) <= 5)
 );
 
 CREATE INDEX idx_products_seller ON products(seller_id);
 CREATE INDEX idx_products_category ON products(category);
 CREATE INDEX idx_products_available ON products(available) WHERE available = TRUE;
+CREATE INDEX idx_products_deleted_at ON products(deleted_at) WHERE deleted_at IS NOT NULL;
 
 ALTER TABLE products ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "products_select_active" ON products
   FOR SELECT TO authenticated
   USING (
-    is_active = TRUE
+    deleted_at IS NULL
     OR auth.uid() = seller_id
   );
 
@@ -906,27 +1041,34 @@ CREATE TABLE equipment (
   type TEXT,
 
   rental_rate_per_day DECIMAL(10,2),
+  weekly_rate DECIMAL(10,2),
+  monthly_rate DECIMAL(10,2),
   operator_included BOOLEAN DEFAULT FALSE,
 
   location GEOGRAPHY(POINT, 4326),
   images TEXT[] DEFAULT ARRAY[]::TEXT[],
+  features TEXT[] DEFAULT ARRAY[]::TEXT[],
   available BOOLEAN DEFAULT TRUE,
-  is_active BOOLEAN DEFAULT TRUE,
+  deleted_at TIMESTAMPTZ,
 
   created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+  CONSTRAINT equipment_images_max_5
+    CHECK (array_length(images, 1) IS NULL OR array_length(images, 1) <= 5)
 );
 
 CREATE INDEX idx_equipment_dealer ON equipment(dealer_id);
 CREATE INDEX idx_equipment_category ON equipment(category);
 CREATE INDEX idx_equipment_location ON equipment USING GIST(location) WHERE location IS NOT NULL AND available = TRUE;
+CREATE INDEX idx_equipment_deleted_at ON equipment(deleted_at) WHERE deleted_at IS NOT NULL;
 
 ALTER TABLE equipment ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "equipment_select_active" ON equipment
   FOR SELECT TO authenticated
   USING (
-    is_active = TRUE AND available = TRUE
+    deleted_at IS NULL AND available = TRUE
     OR auth.uid() = dealer_id
   );
 
@@ -935,6 +1077,85 @@ CREATE POLICY "equipment_owner_all" ON equipment
 
 CREATE TRIGGER equipment_updated_at
   BEFORE UPDATE ON equipment
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+```
+
+---
+
+## 9a. Portfolio & Invoices {#portfolio-invoices}
+
+### 9a.1 Portfolio Items
+*Work samples and project showcases for PP and CON roles.*
+
+```sql
+CREATE TABLE portfolio_items (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+
+  title TEXT NOT NULL,
+  description TEXT,
+  images TEXT[] DEFAULT ARRAY[]::TEXT[]
+    CHECK (array_length(images, 1) IS NULL OR array_length(images, 1) <= 5),
+  drawings_url TEXT,
+  deleted_at TIMESTAMPTZ,
+
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+
+  CONSTRAINT portfolio_items_images_max_5
+    CHECK (array_length(images, 1) IS NULL OR array_length(images, 1) <= 5)
+);
+
+CREATE INDEX idx_portfolio_items_profile ON portfolio_items(profile_id);
+CREATE INDEX idx_portfolio_items_deleted_at ON portfolio_items(deleted_at) WHERE deleted_at IS NOT NULL;
+
+ALTER TABLE portfolio_items ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "portfolio_items_select_public" ON portfolio_items
+  FOR SELECT TO authenticated
+  USING (deleted_at IS NULL OR auth.uid() = profile_id);
+
+CREATE POLICY "portfolio_items_owner_all" ON portfolio_items
+  FOR ALL USING (auth.uid() = profile_id);
+
+CREATE TRIGGER portfolio_items_updated_at
+  BEFORE UPDATE ON portfolio_items
+  FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+```
+
+### 9a.2 Invoices
+*Billing history for all roles, auto-generated on PhonePe payments.*
+
+```sql
+CREATE TABLE invoices (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  subscription_id UUID NOT NULL REFERENCES subscriptions(id) ON DELETE CASCADE,
+  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
+  phonepe_transaction_id TEXT NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  currency TEXT NOT NULL DEFAULT 'INR',
+  billing_period_start TIMESTAMPTZ NOT NULL,
+  billing_period_end TIMESTAMPTZ NOT NULL,
+  invoice_pdf_url TEXT,
+  status TEXT NOT NULL DEFAULT 'PAID'
+    CHECK (status IN ('PAID', 'FAILED', 'REFUNDED', 'PARTIALLY_REFUNDED')),
+  generated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_invoices_subscription ON invoices(subscription_id);
+CREATE INDEX idx_invoices_profile ON invoices(profile_id);
+CREATE INDEX idx_invoices_status ON invoices(status);
+CREATE INDEX idx_invoices_generated_at ON invoices(generated_at);
+
+ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "invoices_owner_select" ON invoices
+  FOR SELECT TO authenticated
+  USING (auth.uid() = profile_id);
+
+CREATE TRIGGER invoices_updated_at
+  BEFORE UPDATE ON invoices
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 ```
 
@@ -979,6 +1200,8 @@ CREATE TABLE notifications (
   related_entity_type TEXT,
   related_entity_id UUID,
 
+  metadata JSONB DEFAULT '{}'::jsonb,
+
   is_read BOOLEAN DEFAULT FALSE,
   read_at TIMESTAMPTZ,
 
@@ -986,13 +1209,15 @@ CREATE TABLE notifications (
   sent_via_email BOOLEAN DEFAULT FALSE,
   sent_via_sms BOOLEAN DEFAULT FALSE,
 
-  created_at TIMESTAMPTZ DEFAULT NOW()
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ
 );
 
 CREATE INDEX idx_notifications_recipient ON notifications(recipient_id);
 CREATE INDEX idx_notifications_type ON notifications(notification_type);
 CREATE INDEX idx_notifications_read ON notifications(is_read, recipient_id);
 CREATE INDEX idx_notifications_created ON notifications(created_at);
+CREATE INDEX idx_notifications_metadata ON notifications USING GIN(metadata);
 
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
@@ -1025,6 +1250,13 @@ CREATE TABLE notification_preferences (
 
   receive_email_notifications BOOLEAN DEFAULT TRUE,
   receive_sms_notifications BOOLEAN DEFAULT FALSE,
+  receive_push_notifications BOOLEAN DEFAULT TRUE,
+
+  -- Service compatibility aliases
+  connection_requested BOOLEAN DEFAULT TRUE,
+  rfp_response_submitted BOOLEAN DEFAULT TRUE,
+  ad_payment_success BOOLEAN DEFAULT TRUE,
+  subscription_expiring BOOLEAN DEFAULT TRUE,
 
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -1040,11 +1272,11 @@ CREATE POLICY "notification_preferences_owner" ON notification_preferences
 ```sql
 CREATE TABLE email_queue (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  recipient_id UUID REFERENCES profiles(id),
+  recipient_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
   to_email TEXT NOT NULL,
   subject TEXT NOT NULL,
   body_html TEXT NOT NULL,
-  notification_id UUID REFERENCES notifications(id),
+  notification_id UUID REFERENCES notifications(id) ON DELETE SET NULL,
 
   status TEXT CHECK (status IN ('PENDING', 'SENT', 'FAILED', 'RETRYING')) DEFAULT 'PENDING',
   attempts INT DEFAULT 0,
@@ -1062,8 +1294,11 @@ CREATE INDEX idx_email_queue_created ON email_queue(created_at);
 
 ALTER TABLE email_queue ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "email_queue_system_all" ON email_queue
-  FOR ALL USING (true);
+-- RLS: super_admin only
+CREATE POLICY "email_queue_super_admin" ON email_queue
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
+  );
 
 CREATE TRIGGER email_queue_updated_at
   BEFORE UPDATE ON email_queue
@@ -1114,7 +1349,7 @@ CREATE TRIGGER system_config_updated_at
 ```sql
 CREATE TABLE system_audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  actor_id UUID,
+  actor_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
   action TEXT NOT NULL,
   target_type TEXT,
   target_id UUID,
@@ -1136,7 +1371,9 @@ CREATE POLICY "system_audit_log_insert" ON system_audit_log
   FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "system_audit_log_admin_select" ON system_audit_log
-  FOR SELECT USING (false);
+  FOR SELECT USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
+  );
 ```
 
 ### 11.3 Audit Purge Queue
@@ -1144,10 +1381,10 @@ CREATE POLICY "system_audit_log_admin_select" ON system_audit_log
 ```sql
 CREATE TABLE audit_purge_queue (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  profile_id UUID NOT NULL REFERENCES profiles(id),
+  profile_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   reason TEXT NOT NULL,
-  requested_by UUID,
-  approved_by UUID,
+  requested_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  approved_by UUID REFERENCES profiles(id) ON DELETE SET NULL,
   status TEXT CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED', 'COMPLETED')) DEFAULT 'PENDING',
   created_at TIMESTAMPTZ DEFAULT NOW(),
   completed_at TIMESTAMPTZ
@@ -1158,8 +1395,11 @@ CREATE INDEX idx_purge_queue_status ON audit_purge_queue(status);
 
 ALTER TABLE audit_purge_queue ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "audit_purge_queue_admin_all" ON audit_purge_queue
-  FOR ALL USING (false);
+-- RLS: super_admin only
+CREATE POLICY "audit_purge_queue_super_admin" ON audit_purge_queue
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
+  );
 ```
 
 ### 11.4 Async Jobs
@@ -1185,8 +1425,11 @@ CREATE INDEX idx_async_jobs_scheduled ON async_jobs(scheduled_at) WHERE status =
 
 ALTER TABLE async_jobs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "async_jobs_system_all" ON async_jobs
-  FOR ALL USING (true);
+-- RLS: super_admin only
+CREATE POLICY "async_jobs_super_admin" ON async_jobs
+  FOR ALL USING (
+    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'super_admin')
+  );
 
 CREATE TRIGGER async_jobs_updated_at
   BEFORE UPDATE ON async_jobs

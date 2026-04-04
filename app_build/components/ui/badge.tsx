@@ -20,7 +20,7 @@ const badgeVariants = cva(
   }
 );
 
-interface BadgeProps extends React.SpanHTMLAttributes<HTMLSpanElement> {
+interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
   variant?: VariantProps<typeof badgeVariants>["variant"];
 }
 

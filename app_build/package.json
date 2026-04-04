@@ -19,19 +19,25 @@
     "validate": "npm run type-check && npm run lint && npm run format:check"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.15",
     "@sentry/nextjs": "^10.47.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.49.4",
-    "@types/leaflet": "^1.9.16",
+    "@types/leaflet": "^1.9.21",
     "@types/pg": "^8.20.0",
-    "@upstash/qstash": "^2.7.0",
+    "@upstash/qstash": "^2.10.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "kysely": "^0.27.5",
     "leaflet": "^1.9.4",
     "next": "15.5.14",
     "pg": "^8.20.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "swr": "^2.3.3"
+    "react-leaflet": "^5.0.0",
+    "resend": "^6.10.0",
+    "swr": "^2.3.3",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

@@ -84,6 +84,14 @@ Derived strictly from:
 
 ---
 
+### Real-Time Updates
+
+- System uses **polling** (not WebSocket) for notification updates and real-time features.
+- Clients poll `GET /api/notifications` at configurable intervals.
+- Dashboard metrics are refreshed via polling `GET /api/dashboard/metrics`.
+
+---
+
 ### Standard Response Format
 
 ```json
@@ -96,18 +104,32 @@ Derived strictly from:
 
 ---
 
-### Error Format
+### Error Response Schema
+
+All endpoints return errors in this shape:
 
 ```json
 {
     "success": false,
     "error": {
-        "code": "ERROR_CODE",
+        "code": "DOMAIN_ACTION_REASON",
         "message": "Human readable message",
         "details": {}
     }
 }
 ```
+
+### HTTP Status Codes
+
+| Status | Meaning |
+| --- | --- |
+| 400 | Bad Request — validation failed or invalid params |
+| 401 | Unauthenticated — missing or invalid JWT |
+| 403 | Forbidden — insufficient role or resource locked |
+| 404 | Not Found — resource does not exist |
+| 409 | Conflict — duplicate resource or state conflict |
+| 429 | Rate Limited — too many requests in time window |
+| 500 | Server Error — unhandled internal error |
 
 ---
 
@@ -146,7 +168,7 @@ Fetch profile (masked if no connection)
 ### Rules
 
 - contact data must be resolved via `get_visible_contact_info()`
-- `subscription_status` determines UI "Hard Lock".
+- `subscription_status` determines UI hard lock state.
 - Blocked users must not be returned
 
 ---
@@ -613,7 +635,7 @@ Fetch profiles (National / Proximity)
 
 ## POST /api/rfps
 
-Create RFP
+Create RFP (PS and ED roles CANNOT create RFPs — they can only send connections).
 
 ### Request
 
@@ -650,7 +672,18 @@ Fetch RFP
 
 ## POST /api/rfps/:id/respond
 
-Submit response
+Submit RFQ response to an RFP.
+
+### Request
+
+```json
+{
+    "proposal_text": "We have 15 years of experience in structural design...",
+    "estimated_cost": 500000.00,
+    "estimated_days": 30,
+    "attachments": ["https://..."]
+}
+```
 
 ---
 
@@ -660,11 +693,88 @@ Submit response
 - max 5 responses/day (rate limit)
 - RFP must be OPEN
 
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "rfp_id": "uuid",
+    "responder_id": "uuid",
+    "proposal_text": "...",
+    "estimated_cost": 500000.00,
+    "estimated_days": 30,
+    "status": "SUBMITTED",
+    "created_at": "2026-04-02T09:00:00Z"
+  }
+}
+```
+
+---
+
+## GET /api/rfps/:id/responses/:responseId
+
+Fetch a single RFQ response detail.
+
+### Guards
+
+- Caller must be RFP creator or the responder who submitted this response.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "rfp_id": "uuid",
+    "responder_id": "uuid",
+    "responder_display_name": "ABC Consultants",
+    "proposal_text": "...",
+    "estimated_cost": 500000.00,
+    "estimated_days": 30,
+    "status": "SUBMITTED",
+    "created_at": "2026-04-02T09:00:00Z"
+  }
+}
+```
+
+---
+
+## POST /api/rfps/:id/responses/:responseId/accept
+
+RFP creator accepts a specific RFQ response. Creates a connection in ACCEPTED state at no credit cost.
+
+**Request**: `{}` (empty body — action is implicit)
+
+**Response 200**
+```json
+{
+  "success": true,
+  "data": {
+    "rfp_response_id": "uuid",
+    "status": "ACCEPTED",
+    "connection_id": "uuid",
+    "connection_status": "ACCEPTED"
+  }
+}
+```
+**Guards**: RFP must be `OPEN`. Caller must be RFP creator. Emits `RFP_RESPONSE_ACCEPTED`.
+**Side Effects**:
+- Creates a `connections` row with `connection_source = 'RFP_RESPONSE'` and `status = 'ACCEPTED'` (not REQUESTED).
+- No credit cost to the requester.
+- Creates an `unmasking_audit` entry for contact reveal.
+
 ---
 
 ## GET /api/rfps
 
 List caller-owned RFPs with status filters and pagination.
+
+### Guards
+
+- PS and ED roles cannot create RFPs — they only see RFPs where they were invited or responded.
 
 ### Query Params
 
@@ -687,9 +797,46 @@ Browse all discoverable OPEN RFPs for the caller.
 
 ---
 
+## POST /api/rfps/:id/publish
+
+Transition RFP from DRAFT → OPEN state.
+
+### Guards
+
+- Caller must be RFP creator.
+- RFP must be in DRAFT state.
+- Required fields must be populated (title, description, target_personas).
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "status": "OPEN",
+    "published_at": "2026-04-02T10:00:00Z"
+  }
+}
+```
+
+---
+
+## PATCH /api/rfps/:id
+
+Update RFP fields.
+
+### Guards
+
+- Caller must be RFP creator.
+- RFP must be in DRAFT state (cannot edit after publish).
+- Location is immutable after publish.
+
+---
+
 ## PATCH /api/rfps/:id/close
 
-Close RFP
+Close RFP (terminal state — cannot be re-opened).
 
 ---
 
@@ -698,12 +845,13 @@ Close RFP
 - pending responses updated
 - notifications triggered
 - RFP_CLOSED event
+- **Terminal state: cannot be re-opened**
 
 ---
 
 ## PATCH /api/rfps/:id/cancel
 
-Cancel RFP
+Cancel RFP (terminal state — cannot be re-opened).
 
 ---
 
@@ -711,6 +859,8 @@ Cancel RFP
 
 - pending responses → WITHDRAWN
 - notifications triggered
+- RFP_CANCELLED event
+- **Terminal state: cannot be re-opened**
 
 ---
 
@@ -778,7 +928,7 @@ List all responses for an RFP.
         "responder_id": "uuid",
         "responder_display_name": "ABC Consultants",
         "proposal_text": "...",
-        "bid_amount": 500000.00,
+        "estimated_cost": 500000.00,
         "estimated_days": 30,
         "status": "SUBMITTED",
         "created_at": "2026-04-02T09:00:00Z"
@@ -1003,6 +1153,38 @@ Allowed only if:
 
 # 9. STATE ENFORCEMENT
 
+## Subscription State Machine
+
+Subscription states and transitions:
+
+| State | Description |
+| --- | --- |
+| `trial` | Initial free trial period |
+| `active` | Paid subscription is current |
+| `expired` | Subscription has lapsed (no grace period) |
+| `hard_locked` | Account locked — no API access except data export/deletion |
+
+### Transitions
+
+| From | To | Trigger |
+| --- | --- | --- |
+| `trial` | `active` | Payment succeeds |
+| `trial` | `expired` | Trial period ends without payment |
+| `active` | `expired` | Billing period ends without renewal |
+| `expired` | `hard_locked` | **Immediate** — no grace period |
+| `expired` | `active` | Payment succeeds (before hard_locked) |
+| `hard_locked` | `active` | Payment succeeds (re-activation) |
+
+### Notes
+
+- `expired` → `hard_locked` happens **immediately** with no grace period.
+- `hard_locked` users cannot create ads, send connections, respond to RFPs, or access most platform features.
+- Only allowed actions for `hard_locked` users: data export (`GET /api/profiles/me/data-export`) and account deletion (`DELETE /api/profiles/me`).
+
+## RFP Terminal States
+
+`CLOSED` and `CANCELLED` are **terminal states** — RFPs in these states cannot be re-opened.
+
 ## Additional Endpoints (Edge Case Coverage)
 
 ---
@@ -1038,7 +1220,7 @@ Unblock a previously blocked user. Sets connection status to `REJECTED` (soft un
 
 ### POST /api/rfps/:id/responses/:responseId/accept
 
-RFP creator accepts a specific response. Triggers a connection offer to the responder at no credit cost.
+RFP creator accepts a specific RFQ response. Creates a connection in ACCEPTED state at no credit cost.
 
 **Request**: `{}` (empty body — action is implicit)
 
@@ -1049,12 +1231,16 @@ RFP creator accepts a specific response. Triggers a connection offer to the resp
   "data": {
     "rfp_response_id": "uuid",
     "status": "ACCEPTED",
-    "connection_offer_id": "uuid"
+    "connection_id": "uuid",
+    "connection_status": "ACCEPTED"
   }
 }
 ```
 **Guards**: RFP must be `OPEN`. Caller must be RFP creator. Emits `RFP_RESPONSE_ACCEPTED`.
-**Side Effect**: Creates a `connections` row with `connection_source = 'RFP_RESPONSE'` at no credit cost to the requester.
+**Side Effects**:
+- Creates a `connections` row with `connection_source = 'RFP_RESPONSE'` and `status = 'ACCEPTED'` (not REQUESTED).
+- No credit cost to the requester.
+- Creates an `unmasking_audit` entry for contact reveal.
 
 ---
 
@@ -1314,7 +1500,7 @@ Each API must emit events:
 - POST /api/rfps/:id/respond → RFP_RESPONSE_SUBMITTED
 - POST /api/rfps/:id/invite → RFP_NEARBY
 - RFP close → RFP_CLOSED
-- RFP cancel → RFP_CLOSED
+- RFP cancel → RFP_CANCELLED
 - POST /api/rfps/:id/responses/:responseId/accept → RFP_RESPONSE_ACCEPTED
 - contact reveal → UNMASKING_TRIGGERED
 - POST /api/ads/:id/connect → CONNECTION_REQUESTED
@@ -1752,6 +1938,508 @@ Returns analytics for a specific ad.
   }
 }
 ```
+
+---
+
+# 17. PLATFORM STATS & DASHBOARD
+
+---
+
+## GET /api/stats
+
+Returns aggregated platform statistics (public endpoint).
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "total_profiles": 12500,
+    "total_connections": 45000,
+    "total_rfps": 3200,
+    "active_ads": 890,
+    "verified_profiles": 8700
+  }
+}
+```
+
+---
+
+## GET /api/profiles/featured
+
+Returns featured profiles for the landing page. Curated by admin selection and DQS score.
+
+### Query Params
+
+- `limit` (default 10, max 20)
+- `persona_type` (optional filter)
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "org_name": "ABC Infra",
+        "persona_type": "CON",
+        "city": "Pune",
+        "state": "Maharashtra",
+        "dqs_score": 0.92,
+        "verification_status": "VERIFIED",
+        "tagline": "Structural Engineering Excellence"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## GET /api/dashboard/metrics
+
+Returns role-specific dashboard metrics for the authenticated user.
+
+### Guards
+
+- Caller must be authenticated.
+- Metrics returned are scoped to caller's `persona_type`.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "pending_connections": 3,
+    "active_rfps": 2,
+    "unread_notifications": 7,
+    "handshake_credits_remaining": 27,
+    "subscription_status": "active",
+    "recent_connections": 12,
+    "recent_rfp_responses": 5
+  }
+}
+```
+
+---
+
+## GET /api/dashboard/activity
+
+Returns recent activity feed for the authenticated user.
+
+### Query Params
+
+- `limit` (default 20, max 50)
+- `type` (optional: `CONNECTION|RFP|AD|SUBSCRIPTION` — default all)
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "type": "CONNECTION_ACCEPTED",
+        "title": "Connection accepted",
+        "message": "ABC Infra accepted your connection request",
+        "created_at": "2026-04-02T10:00:00Z",
+        "entity_id": "uuid",
+        "entity_type": "connection"
+      }
+    ]
+  }
+}
+```
+
+---
+
+# 18. CONSULTANT SERVICES CRUD (CON Role)
+
+---
+
+## GET /api/services
+
+List consultant services offered by the caller.
+
+### Query Params
+
+- `page` (default 1)
+- `page_size` (default 20, max 50)
+
+### Guards
+
+- Caller must have `persona_type = 'CON'`.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "title": "Structural Design",
+        "description": "Complete structural analysis and design",
+        "category": "Structural Engineering",
+        "starting_price": 50000.00,
+        "is_active": true,
+        "created_at": "2026-04-01T08:00:00Z"
+      }
+    ],
+    "meta": { "page": 1, "page_size": 20, "total_count": 1, "total_pages": 1 }
+  }
+}
+```
+
+---
+
+## POST /api/services
+
+Create a new consultant service listing.
+
+### Request
+
+```json
+{
+  "title": "Structural Design",
+  "description": "Complete structural analysis and design for residential and commercial buildings",
+  "category": "Structural Engineering",
+  "starting_price": 50000.00,
+  "deliverables": ["Design drawings", "Structural calculations", "BOQ"]
+}
+```
+
+### Guards
+
+- Caller must have `persona_type = 'CON'`.
+- Caller must not be `hard_locked`.
+
+---
+
+## PUT /api/services/:id
+
+Update a consultant service listing.
+
+### Guards
+
+- Caller must own the service.
+
+---
+
+## DELETE /api/services/:id
+
+Soft-delete a consultant service listing (`is_active = false`).
+
+### Guards
+
+- Caller must own the service.
+
+---
+
+# 19. PORTFOLIO CRUD
+
+---
+
+## GET /api/profiles/me/portfolio
+
+List portfolio items for the authenticated user.
+
+### Query Params
+
+- `page` (default 1)
+- `page_size` (default 20, max 50)
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "title": "Metro Station Design",
+        "description": "Structural design for elevated metro station",
+        "category": "Infrastructure",
+        "images": ["https://..."],
+        "completion_year": 2024,
+        "created_at": "2026-04-01T08:00:00Z"
+      }
+    ],
+    "meta": { "page": 1, "page_size": 20, "total_count": 1, "total_pages": 1 }
+  }
+}
+```
+
+---
+
+## POST /api/profiles/me/portfolio
+
+Create a portfolio item.
+
+### Request
+
+```json
+{
+  "title": "Metro Station Design",
+  "description": "Structural design for elevated metro station",
+  "category": "Infrastructure",
+  "images": ["https://..."],
+  "completion_year": 2024
+}
+```
+
+### Guards
+
+- Caller must not be `hard_locked`.
+
+---
+
+## DELETE /api/profiles/me/portfolio/:id
+
+Delete a portfolio item.
+
+### Guards
+
+- Caller must own the portfolio item.
+
+---
+
+# 20. SUBSCRIPTION MANAGEMENT
+
+---
+
+## GET /api/subscriptions/invoices
+
+Returns payment history for the authenticated user.
+
+### Query Params
+
+- `page` (default 1)
+- `page_size` (default 20, max 50)
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "subscription_id": "uuid",
+        "amount": 99900,
+        "currency": "INR",
+        "status": "COMPLETED",
+        "payment_method": "UPI",
+        "transaction_id": "T260402100000",
+        "created_at": "2026-04-01T10:00:00Z"
+      }
+    ],
+    "meta": { "page": 1, "page_size": 20, "total_count": 1, "total_pages": 1 }
+  }
+}
+```
+
+---
+
+# 21. CONNECTION DETAILS
+
+---
+
+## GET /api/connections/:id
+
+Returns single connection detail including masked/unmasked contact info based on connection state.
+
+### Guards
+
+- Caller must be either party in the connection.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "id": "uuid",
+    "initiator_id": "uuid",
+    "target_id": "uuid",
+    "status": "ACCEPTED",
+    "source": "DIRECT",
+    "message": "Interested in collaboration",
+    "contact_visible": true,
+    "created_at": "2026-04-01T08:00:00Z",
+    "updated_at": "2026-04-01T09:00:00Z",
+    "other_party": {
+      "id": "uuid",
+      "org_name": "ABC Infra",
+      "persona_type": "CON",
+      "city": "Pune",
+      "dqs_score": 0.85
+    }
+  }
+}
+```
+
+---
+
+# 22. USER ADS
+
+---
+
+## GET /api/ads/me
+
+Returns ads owned by the current authenticated user.
+
+### Query Params
+
+- `status` (optional: `DRAFT|PENDING_PAYMENT|PENDING_MODERATION|ACTIVE|PAUSED|FLAGGED|SUSPENDED|EXPIRED`)
+- `page` (default 1)
+- `page_size` (default 20, max 50)
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "uuid",
+        "title": "Hempcrete Blocks",
+        "status": "ACTIVE",
+        "impressions": 1250,
+        "clicks": 87,
+        "connects": 12,
+        "created_at": "2026-04-01T08:00:00Z"
+      }
+    ],
+    "meta": { "page": 1, "page_size": 20, "total_count": 1, "total_pages": 1 }
+  }
+}
+```
+
+---
+
+# 23. GDPR & ACCOUNT MANAGEMENT
+
+---
+
+## GET /api/profiles/me/data-export
+
+Export all user data for GDPR compliance (Right to Access).
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "export_id": "uuid",
+    "status": "PROCESSING",
+    "download_url": null,
+    "expires_at": null,
+    "requested_at": "2026-04-02T10:00:00Z"
+  }
+}
+```
+
+### Notes
+
+- Export includes: profile data, connections, RFPs, responses, ads, notifications, audit logs.
+- PII of other users is excluded (only caller's own data is exported).
+- Download URL is generated when export is ready (async processing).
+
+---
+
+## DELETE /api/profiles/me
+
+Request account deletion (GDPR Right to Erasure).
+
+### Request
+
+```json
+{
+  "reason": "string (optional)"
+}
+```
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "deletion_request_id": "uuid",
+    "status": "PENDING_ADMIN_APPROVAL",
+    "requested_at": "2026-04-02T10:00:00Z"
+  }
+}
+```
+
+### Guards
+
+- Requires admin approval before execution (see `POST /api/admin/audit/purge/:id/approve`).
+- All active subscriptions are cancelled.
+- All active ads are paused.
+- Row is preserved for audit; PII is hard-deleted upon approval.
+
+---
+
+# 24. PROJECTS (COMING SOON)
+
+---
+
+## GET /api/projects/me
+
+Returns "Coming Soon" placeholder. Projects module is not available in Phase 1.
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "data": {
+    "message": "Projects module coming soon in Phase 2",
+    "available_in_phase": 2
+  }
+}
+```
+
+---
+
+# 25. AD MODERATION FLOW
+
+---
+
+The ad lifecycle after payment follows this sequence:
+
+```
+PAYMENT_SUCCESS → PENDING_MODERATION → Sightengine scan → ACTIVE (pass) or FLAGGED (fail)
+                                                                        ↓
+                                                              Admin review → ACTIVE (cleared) or SUSPENDED (confirmed violation)
+```
+
+### State Transitions
+
+| From | To | Trigger |
+| --- | --- | --- |
+| DRAFT | PENDING_PAYMENT | User initiates payment |
+| PENDING_PAYMENT | PENDING_MODERATION | Payment succeeds |
+| PENDING_MODERATION | ACTIVE | Sightengine scan passes |
+| PENDING_MODERATION | FLAGGED | Sightengine scan fails |
+| FLAGGED | ACTIVE | Admin clears ad |
+| FLAGGED | SUSPENDED | Admin confirms violation |
+| SUSPENDED | ACTIVE | Admin clears after refund/appeal |
+| ACTIVE | PAUSED | User pauses ad |
+| ACTIVE | EXPIRED | Ad duration expires |
 
 ---
 

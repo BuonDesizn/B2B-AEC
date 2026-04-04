@@ -45,6 +45,7 @@ REQUESTED       ──(30 days elapse, pg_cron)───────────
 ACCEPTED        ──(either party blocks)─────────────────▶ BLOCKED   → address_book entry remains
 REJECTED        ──(seeker re-initiates, costs 1 credit)─▶ REQUESTED
 EXPIRED         ──(seeker re-initiates, costs 1 credit)─▶ REQUESTED
+BLOCKED         ──(unblock action)─────────────────────▶ REJECTED  → address_book entry remains, PII stays hidden
 ```
 
 ### Guards & Invariants
@@ -78,6 +79,7 @@ trial              ──(H+49 elapsed, QStash job)───────▶ hard
 active             ──(monthly renewal success)────────▶ active (30 credits reset)
 active             ──(payment fails / cancels)────────▶ expired
 expired            ──(PhonePe payment success)────────▶ active
+expired            ──(immediately, no grace period)───▶ hard_locked
 hard_locked        ──(PhonePe payment success)────────▶ active (hard lock lifted)
 ```
 
@@ -109,9 +111,9 @@ _Spec: RFP-001 | Tables: `rfps`, `rfp_responses`_
 [Creator drafts] ──(save)────────────────────────────▶ DRAFT
 DRAFT            ──(creator publishes)────────────────▶ OPEN  → broadcast to matched profiles within radius
 OPEN             ──(deadline passes, pg_cron)──────────▶ EXPIRED
-OPEN             ──(creator closes)───────────────────▶ CLOSED
-OPEN             ──(creator cancels)──────────────────▶ CANCELLED
-DRAFT            ──(creator cancels)──────────────────▶ CANCELLED
+OPEN             ──(creator closes)───────────────────▶ CLOSED  → TERMINAL: cannot be re-opened
+OPEN             ──(creator cancels)──────────────────▶ CANCELLED  → TERMINAL: cannot be re-opened
+DRAFT            ──(creator cancels)──────────────────▶ CANCELLED  → TERMINAL: cannot be re-opened
 ```
 
 ### RFP Response States
@@ -120,8 +122,18 @@ DRAFT            ──(creator cancels)─────────────�
 |-------|----------|---------|
 | `SUBMITTED` | `SUBMITTED` | Response sent by professional |
 | `SHORTLISTED` | `SHORTLISTED` | Creator shortlisted this response |
-| `ACCEPTED` | `ACCEPTED` | Creator accepted — triggers connection offer |
+| `ACCEPTED` | `ACCEPTED` | Creator accepted — triggers connection (ACCEPTED status, no credit cost) |
 | `REJECTED` | `REJECTED` | Creator rejected |
+
+### RFP Response Transitions
+
+```
+SUBMITTED       ──(creator shortlists)────────────────▶ SHORTLISTED
+SUBMITTED       ──(creator accepts directly)──────────▶ ACCEPTED  → creates connection in ACCEPTED state, no credit cost
+SUBMITTED       ──(creator rejects directly)──────────▶ REJECTED
+SHORTLISTED     ──(creator accepts)───────────────────▶ ACCEPTED  → creates connection in ACCEPTED state, no credit cost
+SHORTLISTED     ──(creator rejects)───────────────────▶ REJECTED
+```
 
 ### Guards & Invariants
 
@@ -168,25 +180,30 @@ _Spec: AD-001 | Tables: `ads`_
 |-------|----------|-------------|
 | `DRAFT` | `DRAFT` | Created but not paid |
 | `PENDING_PAYMENT` | `PENDING_PAYMENT` | PhonePe payment initiated |
-| `PENDING_MODERATION` | `PENDING_MODERATION` | Awaiting Sightengine scan |
-| `ACTIVE` | `ACTIVE` | Payment confirmed, ad live |
+| `PENDING_MODERATION` | `PENDING_MODERATION` | Payment confirmed, awaiting Sightengine scan |
+| `ACTIVE` | `ACTIVE` | Moderation passed, ad live |
 | `PAUSED` | `PAUSED` | Creator paused ad (can be resumed) |
 | `EXPIRED` | `EXPIRED` | Ad duration elapsed |
-| `SUSPENDED` | `SUSPENDED` | Content moderation flag or admin action |
+| `FLAGGED` | `FLAGGED` | Sightengine flagged content, awaiting admin review |
+| `SUSPENDED` | `SUSPENDED` | Admin confirmed violation or repeated flags |
 
 ### Transitions
 
 ```
 [Creator submits ad] ──────────────────────────────▶ DRAFT
 DRAFT               ──(initiates PhonePe payment)──▶ PENDING_PAYMENT
-PENDING_PAYMENT     ──(PhonePe webhook: success)───▶ ACTIVE
+PENDING_PAYMENT     ──(PhonePe webhook: success)───▶ PENDING_MODERATION
 PENDING_PAYMENT     ──(PhonePe webhook: failed)────▶ DRAFT
+PENDING_MODERATION  ──(Sightengine scan passes)────▶ ACTIVE
+PENDING_MODERATION  ──(Sightengine flags content)──▶ FLAGGED
+FLAGGED             ──(admin reviews, clears)──────▶ ACTIVE
+FLAGGED             ──(admin confirms violation)──▶ SUSPENDED
 ACTIVE              ──(creator pauses)─────────────▶ PAUSED
 PAUSED              ──(creator resumes)────────────▶ ACTIVE
 ACTIVE              ──(duration ends, pg_cron)─────▶ EXPIRED
-ACTIVE              ──(Sightengine flags content)──▶ SUSPENDED
-SUSPENDED           ──(admin clears flag)───────────▶ ACTIVE
-EXPIRED             ──(creator renews + pays)───────▶ ACTIVE
+ACTIVE              ──(Sightengine re-scan flags)──▶ FLAGGED
+SUSPENDED           ──(admin clears)───────────────▶ ACTIVE
+EXPIRED             ──(creator renews + pays)───────▶ PENDING_MODERATION
 ```
 
 ---
@@ -197,7 +214,7 @@ EXPIRED             ──(creator renews + pays)───────▶ ACTIVE
 |---------|---------------|-----------------|
 | Handshake ACCEPTED | Handshake | DQS recalculated for both parties |
 | Subscription HARD_LOCKED | Subscription | Blocks Handshake REQUESTED transition |
-| RFP Response ACCEPTED | RFP | Triggers Handshake REQUESTED (at no credit cost) |
+| RFP Response ACCEPTED | RFP | Triggers Handshake ACCEPTED (creates connection in ACCEPTED state, no credit cost, unmasking_audit entry) |
 | Ad PENDING_PAYMENT | Advertisement | QStash job scheduled for expiry |
 | Trial H+49 elapsed | Subscription | Blocks all active features |
 | Handshake REQUESTED | Handshake | Credits decremented on requester's profile |
@@ -205,11 +222,11 @@ EXPIRED             ──(creator renews + pays)───────▶ ACTIVE
 ---
 
 ## 6. DQS Recalculation Contract
-_Spec: RM-001 | Table: `profiles` | Runtime: pg_cron_
+_Spec: RM-001 | Table: `profiles` | Runtime: QStash on-demand trigger_
 
 ### Trigger
 
-- Daily at `02:00 UTC` via `dqs-daily-recalc` cron job.
+- On-demand via QStash HTTP job calling `/api/jobs/dqs-recalc`.
 
 ### Formula
 

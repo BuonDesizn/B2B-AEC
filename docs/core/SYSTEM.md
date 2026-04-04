@@ -67,13 +67,18 @@ Every profile must map to one or more of these specialized personas:
 | **PP** | Project Professional | Architects, Interior Designers, Landscape. | 70% Q (DQS) / 30% D |
 | **CON** | Contractor | Civil, MEP, HVAC, Finishing. | 70% Q (DQS) / 30% D |
 | **C** | Consultant | Structural, PMC, Valuation, Legal. | 70% Q (DQS) / 30% D |
-| **PS** | Product Seller | Manufacturers, Wholesalers (Cement, Steel, etc). | 70% Q (DQS) / 30% D |
-| **ED** | Equipment Dealer | Heavy Machinery, Rental, Sales. | 70% Q (DQS) / 30% D |
+| **PS** | Product Seller | Manufacturers, Wholesalers (Cement, Steel, etc). **Cannot create RFPs.** | 70% Q (DQS) / 30% D |
+| **ED** | Equipment Dealer | Heavy Machinery, Rental, Sales. **Cannot create RFPs.** | 70% Q (DQS) / 30% D |
 
 ### Operational Rule: Proximity Paradox
 *The system weights distance differently based on role:*
 - **Local (PP/CON):** Radius-sensitive. High distance penalty.
 - **National (C/PS):** Quality-focused. National discovery with uniform weighting.
+
+### Operational Rule: Role Isolation
+- **Dashboard/Nav isolation** — each role sees only relevant UI sections and navigation.
+- **NOT discovery isolation** — all roles can see all other roles in discovery/search. A PS profile can discover and connect with a PP profile, and vice versa.
+- PS and ED profiles **cannot create RFPs**. They may only send connection requests and respond to RFPs broadcast to them.
 
 ---
 
@@ -123,8 +128,10 @@ Conflicts are resolved by prioritizing:
 Never violate:
 - **Privacy Rules** (Masking/Audit).
 - **Quality Ranking** (70% DQS).
-- **Role Isolation** (Dashboard-level gating).
-- **Zero-Bidding Logic** (Connections > Transactions).
+- **Role Isolation** (Dashboard-level gating, NOT discovery isolation).
+- **Zero-Bidding Logic** (RFP Responses > Transactions).
+- **Subscription Status Values** are lowercase: `trial`, `active`, `expired`, `hard_locked`.
+- **Expired → hard_locked** transition is immediate (no grace period).
 
 ---
 
