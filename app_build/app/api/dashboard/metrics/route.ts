@@ -42,6 +42,16 @@ export async function GET(request: Request) {
 
     const personaType = profile.persona_type;
 
+    // Build metric cards based on persona type
+    const metricCards: Record<string, { label: string; value: number; href: string }> = {};
+
+    // Common metrics
+    metricCards.metric1 = {
+      label: 'Connections',
+      value: metrics.active_connections,
+      href: '/address-book'
+    };
+
     if (personaType === 'PP' || personaType === 'C' || personaType === 'CON') {
       const openRfps = await db
         .selectFrom('rfps')
@@ -61,6 +71,22 @@ export async function GET(request: Request) {
 
       metrics.open_rfps = Number(openRfps?.count ?? 0);
       metrics.responses_count = Number(responses?.count ?? 0);
+
+      metricCards.metric2 = {
+        label: 'Open RFPs',
+        value: metrics.open_rfps,
+        href: '/rfps'
+      };
+      metricCards.metric3 = {
+        label: 'My Responses',
+        value: metrics.responses_count,
+        href: '/my-projects'
+      };
+      metricCards.metric4 = {
+        label: 'Handshake Credits',
+        value: profile.handshake_credits || 0,
+        href: '/discover'
+      };
     }
 
     if (personaType === 'PS') {
@@ -78,7 +104,7 @@ export async function GET(request: Request) {
         .executeTakeFirst();
 
       const activeAds = await db
-        .selectFrom('ads')
+        .from('ads')
         .select(db.fn.count('id').as('count'))
         .where('profile_id', '=', user.id)
         .where('status', '=', 'ACTIVE')
@@ -87,6 +113,22 @@ export async function GET(request: Request) {
       metrics.products_listed = Number(productsListed?.count ?? 0);
       metrics.enquiries_received = Number(enquiriesReceived?.count ?? 0);
       metrics.active_ads = Number(activeAds?.count ?? 0);
+
+      metricCards.metric2 = {
+        label: 'Products',
+        value: metrics.products_listed,
+        href: '/products'
+      };
+      metricCards.metric3 = {
+        label: 'Enquiries',
+        value: metrics.enquiries_received,
+        href: '/enquiries'
+      };
+      metricCards.metric4 = {
+        label: 'Active Ads',
+        value: metrics.active_ads,
+        href: '/ads'
+      };
     }
 
     if (personaType === 'ED') {
@@ -104,7 +146,7 @@ export async function GET(request: Request) {
         .executeTakeFirst();
 
       const activeAds = await db
-        .selectFrom('ads')
+        .from('ads')
         .select(db.fn.count('id').as('count'))
         .where('profile_id', '=', user.id)
         .where('status', '=', 'ACTIVE')
@@ -113,7 +155,29 @@ export async function GET(request: Request) {
       metrics.equipment_listed = Number(equipmentListed?.count ?? 0);
       metrics.requests_received = Number(requestsReceived?.count ?? 0);
       metrics.active_ads = Number(activeAds?.count ?? 0);
+
+      metricCards.metric2 = {
+        label: 'Equipment',
+        value: metrics.equipment_listed,
+        href: '/equipment'
+      };
+      metricCards.metric3 = {
+        label: 'Enquiries',
+        value: metrics.requests_received,
+        href: '/enquiries'
+      };
+      metricCards.metric4 = {
+        label: 'Active Ads',
+        value: metrics.active_ads,
+        href: '/ads'
+      };
     }
+
+    // Add metric cards to response
+    metrics.metric1 = metricCards.metric1;
+    metrics.metric2 = metricCards.metric2;
+    metrics.metric3 = metricCards.metric3;
+    metrics.metric4 = metricCards.metric4;
 
     return NextResponse.json({ success: true, data: metrics });
   } catch (error) {
