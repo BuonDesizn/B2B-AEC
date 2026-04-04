@@ -15,7 +15,7 @@ const baseNavItems: NavItem[] = [
   { href: '/discover', label: 'Discover', icon: '🔍' },
   { href: '/address-book', label: 'Address Book', icon: '📇' },
   { href: '/notifications', label: 'Notifications', icon: '🔔' },
-  { href: '/my-plan', label: 'My Plan', icon: '💳' },
+  { href: '/plan', label: 'My Plan', icon: '💳' },
   { href: '/settings', label: 'Settings', icon: '⚙️' },
 ];
 
