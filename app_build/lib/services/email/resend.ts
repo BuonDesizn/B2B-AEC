@@ -1,7 +1,17 @@
 // @witness [COM-001]
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: Resend | null = null;
+
+function getResend(): Resend {
+  if (!_resend) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error('RESEND_API_KEY environment variable is not set');
+    }
+    _resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return _resend;
+}
 
 export interface SendEmailInput {
   to: string;
@@ -14,7 +24,7 @@ export interface SendEmailInput {
 export async function sendEmail(input: SendEmailInput) {
   const from = input.from ?? process.env.RESEND_FROM_EMAIL ?? 'noreply@buondesizn.com';
 
-  const result = await resend.emails.send({
+  const result = await getResend().emails.send({
     from: `BuonDesizn <${from}>`,
     to: input.to,
     subject: input.subject,
