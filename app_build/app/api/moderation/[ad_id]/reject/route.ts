@@ -6,14 +6,15 @@ import { moderationService } from '@/lib/services/moderation';
 
 export async function POST(
   request: Request,
-  { params }: { params: { ad_id: string } }
+  { params }: { params: Promise<{ ad_id: string }> }
 ) {
   try {
     const admin = await requireAdmin(request);
+    const { ad_id } = await params;
     const body = await request.json();
 
     const result = await moderationService.rejectAd(
-      params.ad_id,
+      ad_id,
       admin.id,
       body.reason
     );

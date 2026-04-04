@@ -6,11 +6,12 @@ import { rfpService } from '@/lib/services/rfp';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth(request);
-    const rfp = await rfpService.close(params.id, user.id);
+    const { id } = await params;
+    const rfp = await rfpService.close(id, user.id);
     return NextResponse.json({ success: true, data: rfp });
   } catch (error) {
     if (error instanceof AuthError) {

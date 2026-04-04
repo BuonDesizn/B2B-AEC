@@ -6,10 +6,11 @@ import { rfpService } from '@/lib/services/rfp';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth(request);
+    const { id } = await params;
     const body = await request.json();
 
     if (!body.response_id) {
@@ -20,7 +21,7 @@ export async function POST(
     }
 
     const result = await rfpService.acceptResponse(
-      params.id,
+      id,
       body.response_id,
       user.id
     );

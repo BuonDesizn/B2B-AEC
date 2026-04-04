@@ -253,9 +253,14 @@ export const personnelService = {
       throw new Error('VALIDATION_FAILED');
     }
 
+    const companyGstin = profile.gstin;
+    if (!companyGstin) {
+      throw new Error('VALIDATION_FAILED');
+    }
+
     const values = inputs.map((input) => ({
       profile_id: profileId,
-      company_gstin: profile.gstin,
+      company_gstin: companyGstin,
       full_name: input.full_name,
       designation: input.designation,
       qualification: input.qualification ?? null,

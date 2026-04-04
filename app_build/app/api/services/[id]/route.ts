@@ -6,11 +6,12 @@ import { servicesService } from '@/lib/services/services';
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth(_request);
-    const service = await servicesService.getById(params.id);
+    const { id } = await params;
+    const service = await servicesService.getById(id);
 
     if (!service) {
       return NextResponse.json(
@@ -36,13 +37,14 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth(request);
+    const { id } = await params;
     const body = await request.json();
 
-    const service = await servicesService.update(params.id, body, user.id);
+    const service = await servicesService.update(id, body, user.id);
     return NextResponse.json({ success: true, data: service });
   } catch (error) {
     if (error instanceof AuthError) {
@@ -60,11 +62,12 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth(request);
-    const service = await servicesService.deactivate(params.id, user.id);
+    const { id } = await params;
+    const service = await servicesService.deactivate(id, user.id);
     return NextResponse.json({ success: true, data: service });
   } catch (error) {
     if (error instanceof AuthError) {

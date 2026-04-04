@@ -7,16 +7,16 @@ import { broadcastRFP } from '@/lib/services/rfp/broadcast';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth(request);
+    const { id } = await params;
 
-    const rfp = await rfpService.publish(params.id, user.id);
+    const rfp = await rfpService.publish(id, user.id);
 
-    // Broadcast to nearby professionals (non-blocking)
-    broadcastRFP(params.id).catch((err) =>
-      console.error(`RFP broadcast failed for ${params.id}:`, err)
+    broadcastRFP(id).catch((err) =>
+      console.error(`RFP broadcast failed for ${id}:`, err)
     );
 
     return NextResponse.json({ success: true, data: rfp });

@@ -6,11 +6,12 @@ import { rfpService } from '@/lib/services/rfp';
 
 export async function GET(
   _request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAuth(_request);
-    const rfp = await rfpService.getById(params.id);
+    const { id } = await params;
+    const rfp = await rfpService.getById(id);
 
     if (!rfp) {
       return NextResponse.json(
@@ -37,13 +38,14 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth(request);
+    const { id } = await params;
     const body = await request.json();
 
-    const rfp = await rfpService.update(params.id, body, user.id);
+    const rfp = await rfpService.update(id, body, user.id);
 
     return NextResponse.json({ success: true, data: rfp });
   } catch (error) {

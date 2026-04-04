@@ -6,12 +6,13 @@ import { moderationService } from '@/lib/services/moderation';
 
 export async function POST(
   request: Request,
-  { params }: { params: { ad_id: string } }
+  { params }: { params: Promise<{ ad_id: string }> }
 ) {
   try {
     const admin = await requireAdmin(request);
+    const { ad_id } = await params;
 
-    const result = await moderationService.clearAd(params.ad_id, admin.id);
+    const result = await moderationService.clearAd(ad_id, admin.id);
 
     return NextResponse.json({ success: true, data: result });
   } catch (error) {

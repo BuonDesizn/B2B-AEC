@@ -6,12 +6,13 @@ import { notificationService } from '@/lib/services/notifications';
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth(request);
+    const { id } = await params;
 
-    const result = await notificationService.markAsRead(params.id, user.id);
+    const result = await notificationService.markAsRead(id, user.id);
 
     if (!result) {
       return NextResponse.json(

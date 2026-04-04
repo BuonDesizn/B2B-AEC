@@ -6,10 +6,11 @@ import { rfpService } from '@/lib/services/rfp';
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth(request);
+    const { id } = await params;
     const body = await request.json();
 
     if (!body.proposal) {
@@ -20,7 +21,7 @@ export async function POST(
     }
 
     const response = await rfpService.submitResponse({
-      rfp_id: params.id,
+      rfp_id: id,
       responder_id: user.id,
       proposal: body.proposal,
       estimated_cost: body.estimated_cost,
