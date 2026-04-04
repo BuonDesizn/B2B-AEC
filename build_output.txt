@@ -1,0 +1,33 @@
+
+> buondesizn-app@0.1.0 build
+> next build
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead.
+   ▲ Next.js 15.5.14
+   - Environments: .env.local
+   - Experiments (use with caution):
+     · clientTraceMetadata
+
+   Creating an optimized production build ...
+[@sentry/nextjs] Could not find a Next.js instrumentation file. This indicates an incomplete configuration of the Sentry SDK. An instrumentation file is required for the Sentry SDK to be initialized on the server: https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/#create-initialization-config-files (you can suppress this warning by setting SENTRY_SUPPRESS_INSTRUMENTATION_FILE_WARNING=1 as environment variable)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (215kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (139kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+<w> [webpack.cache.PackFileCacheStrategy] Serializing big strings (184kiB) impacts deserialization performance (consider using Buffer instead and decode when needed)
+ ✓ Compiled successfully in 39.7s
+   Skipping linting
+   Checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/123) ...
+   Generating static pages (30/123) 
+   Generating static pages (61/123) 
+   Generating static pages (92/123) 
+ ✓ Generating static pages (123/123)
+
+> Build error occurred
+[Error: ENOENT: no such file or directory, rename '/Users/ssrrattan/Documents/b2b ref pc/app_build/.next/export/500.html' -> '/Users/ssrrattan/Documents/b2b ref pc/app_build/.next/server/pages/500.html'] {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'rename',
+  path: '/Users/ssrrattan/Documents/b2b ref pc/app_build/.next/export/500.html',
+  dest: '/Users/ssrrattan/Documents/b2b ref pc/app_build/.next/server/pages/500.html'
+}
