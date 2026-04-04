@@ -65,7 +65,7 @@
              └── → POST /api/rfps/[id]/responses/[responseId]/accept
 
 /portfolio (✅) → /api/profiles/me/portfolio
-/my-projects (⚠️) → /api/projects/me
+/my-projects (✅) → /api/projects/me
 ```
 
 ### C - Company
