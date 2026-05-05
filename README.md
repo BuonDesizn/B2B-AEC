@@ -14,12 +14,14 @@
 | [`supabase/`](supabase/) | Migrations, seed data, and local dev config. |
 
 ### 📂 Detailed Documentation Map
-- 🌌 **[Core Documents](docs/core/)**: `SOUL.md` (Strategic DNA), `SYSTEM.md` (Operational Framework).
-- 🔐 **[Database/Security](docs/database/)**: `db_schema.md`, `rls_policies.md`.
+- 🌌 **[Core Documents](docs/core/)**: `SOUL.md`, `SYSTEM.md`, `ARCHITECTURE.md`, `PATTERNS.md`, `UBIQUITOUS_LANGUAGE.md`, `STYLEGUIDE.md`.
+- 🔐 **[Database/Security](docs/database/)**: `db_schema.md`, `rls_policies.md`, `MOCK_DATA_BLUEPRINT.md`.
 - 🔌 **[API/Events](docs/api/)**: `API_CONTRACT.md`.
-- 📊 **[System/Dashboards](docs/system/)**: `EVENTS.md`, `DASHBOARDS.md`, `STATE_MACHINES.md`.
+- 📊 **[System/Dashboards](docs/system/)**: `EVENTS.md`, `DASHBOARDS.md`, `STATE_MACHINES.md`, `CONTRACT_ALIGNMENT.md`, `GAP_ANALYSIS_SUMMARY.md`.
 - 🤝 **[Business Logic](docs/business/)**: `business_logic_edge_cases.md`.
-- 📋 **[Specs](docs/specs/)**: Formal spec documents (ID-001, RM-001, HD-001, ...).
+- 📋 **[Specs](docs/specs/)**: Formal spec documents (ID-001, CON-001, ED-001, AD-001, HD-001, MOD-001, MON-001, PP-001, PS-001, RFP-001, RM-001, UI-001).
+- 📁 **[Audit](docs/audit/)**: Flow audits and legacy role documentation.
+- 🗺️ **[Strategy](docs/strategy/)**: Strategic planning and execution roadmaps.
 
 ---
 
@@ -39,20 +41,20 @@ supabase start
 supabase db push
 
 # 5. Run the app
-npm run dev
+cd app_build && npm run dev
 ```
 
 ---
 
 ## 🤖 Autonomous Development
 
-New feature? Use the `/startcycle` command:
+Building new features? Use the `/startcycle` command in your AI developer:
 
 ```
 /startcycle "Describe your feature"
 ```
 
-This triggers the full SDD (Streamlined Development) loop. See [.agents/BOOTSTRAP.md](.agents/BOOTSTRAP.md) for agent onboarding and [.agents/workflows/startcycle.md](.agents/workflows/startcycle.md) for the workflow definition.
+This triggers the SDD (Streamlined Development) loop — the full pipeline for spec-driven implementation, code generation, testing, and deployment. See [.agents/BOOTSTRAP.md](.agents/BOOTSTRAP.md) for agent onboarding and [.agents/workflows/startcycle.md](.agents/workflows/startcycle.md) for the workflow definition.
 
 ---
 
@@ -67,6 +69,8 @@ See **[AGENTS.md](AGENTS.md)** for detailed rules and coordination logic.
 
 ---
 
-## 🚀 Active Module
-- **[Key Personnel Design](docs/plans/2026-03-31-key-personnel-design.md)**: Implementing the master representative roster.
-- **Spec**: [ID-001](docs/specs/ID-001_identity_gstin_linking.md) — GSTIN Linking & Company DNA
+## 🚀 Active Development
+Building out the core B2B marketplace with:
+- **Key Personnel Management**: Master representative roster tied to Company DNA (GSTIN)
+- **Identity System**: GSTIN linking & Company DNA verification ([ID-001](docs/specs/ID-001_identity_gstin_linking.md))
+- **Core Marketplace Flows**: RFP lifecycle, product sellers, equipment dealers, contractors, consultants, project professionals
